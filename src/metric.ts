@@ -9,10 +9,7 @@ export interface MetricConfiguration<T extends Metric<T, L>, L extends string> {
 	collect?: CollectFunction<T, L>;
 }
 
-/**
- * @abstract
- */
-export class Metric<T extends Metric<T, L>, L extends string> {
+export abstract class Metric<T extends Metric<T, L>, L extends string> {
 	readonly name: string;
 	readonly help: string;
 	readonly collect: MetricConfiguration<T, L>["collect"];
@@ -21,8 +18,5 @@ export class Metric<T extends Metric<T, L>, L extends string> {
 		this.help = config.help;
 		this.collect = config.collect;
 	}
-
-	reset() {
-		throw new Error("Metric.prototype.reset not implemented");
-	}
+	abstract reset(): void;
 }
