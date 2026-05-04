@@ -4,9 +4,11 @@ import { hashLabels, type LabelObject } from "./utils.ts";
 export interface GaugeConfiguration<L extends string>
 	extends MetricConfiguration<Gauge<L>, L> {}
 
-export class Gauge<L extends string> extends Metric<Gauge<L>, L> {
-	#values = new Map<string, { value: number; labels: LabelObject<L> }>();
-
+export class Gauge<L extends string> extends Metric<
+	Gauge<L>,
+	L,
+	{ value: number; labels: LabelObject<L> }
+> {
 	/**
 	 * Increment gauge
 	 * @param value The value to increment with
@@ -18,12 +20,12 @@ export class Gauge<L extends string> extends Metric<Gauge<L>, L> {
 		const labels = typeof param1 === "object" ? param1 : ({} as LabelObject<L>);
 
 		const hashed = hashLabels(labels);
-		const entry = this.#values.get(hashed);
+		const entry = this.values.get(hashed);
 
 		if (entry) {
 			entry.value += value;
 		} else {
-			this.#values.set(hashed, { value, labels });
+			this.values.set(hashed, { value, labels });
 		}
 	}
 
@@ -53,7 +55,7 @@ export class Gauge<L extends string> extends Metric<Gauge<L>, L> {
 				this.dec(labels, value);
 			},
 			reset: () => {
-				this.#values.delete(hashLabels(labels));
+				this.values.delete(hashLabels(labels));
 			},
 		};
 	}
@@ -62,9 +64,9 @@ export class Gauge<L extends string> extends Metric<Gauge<L>, L> {
 	 * Reset the gauge
 	 */
 	reset() {
-		this.#values.clear();
+		this.values.clear();
 		if (!this.labelNames.length) {
-			this.#values.set(hashLabels({}), { labels: {}, value: 0 }); // todo: is this correct behavior?
+			this.values.set(hashLabels({}), { labels: {}, value: 0 }); // todo: is this correct behavior?
 		}
 	}
 }

@@ -9,11 +9,14 @@ export interface MetricConfiguration<T extends Metric<T, L>, L extends string> {
 	collect?: CollectFunction<T, L>;
 }
 
-export abstract class Metric<T extends Metric<T, L>, L extends string> {
+export abstract class Metric<T extends Metric<T, L>, L extends string, V extends object = object> {
 	readonly name: string;
 	readonly help: string;
 	readonly labelNames: readonly string[];
 	readonly collect: MetricConfiguration<T, L>["collect"];
+
+	protected values = new Map<string, V>();
+	
 	constructor(config: MetricConfiguration<T, L>) {
 		this.name = config.name;
 		this.help = config.help;

@@ -8,17 +8,14 @@ export interface HistogramConfiguration<L extends string, B extends number>
 
 export class Histogram<L extends string, B extends number> extends Metric<
 	Histogram<L, B>,
-	L
-> {
-	#values = new Map<
-		string,
+	L,
 		{
 			sum: number;
 			count: number;
 			bucketValues: Record<B, number>;
 			labels: LabelObject<L>;
 		}
-	>();
+> {
 	readonly #buckets: readonly B[];
 
 	constructor(config: HistogramConfiguration<L, B>) {
@@ -39,11 +36,11 @@ export class Histogram<L extends string, B extends number> extends Metric<
 	 */
 	observe(labels: LabelObject<L>, value: number) {
 		const hashed = hashLabels(labels);
-		let entry = this.#values.get(hashed);
 
+		let entry = this.values.get(hashed);
 		if (!entry) {
 			entry = createValueEntry(this.#buckets, labels);
-			this.#values.set(hashed, entry);
+			this.values.set(hashed, entry);
 		}
 
 		if (!Number.isFinite(value)) {
@@ -71,7 +68,7 @@ export class Histogram<L extends string, B extends number> extends Metric<
 				this.observe(labels, value);
 			},
 			reset: () => {
-				this.#values.delete(hashLabels(labels));
+				this.values.delete(hashLabels(labels));
 			},
 		};
 	}
@@ -90,9 +87,9 @@ export class Histogram<L extends string, B extends number> extends Metric<
 	}
 
 	reset() {
-		this.#values.clear();
+		this.values.clear();
 		if (!this.labelNames.length) {
-			this.#values.set(hashLabels({}), createValueEntry(this.#buckets, {})); // todo: is this correct behavior?
+			this.values.set(hashLabels({}), createValueEntry(this.#buckets, {})); // todo: is this correct behavior?
 		}
 	}
 }

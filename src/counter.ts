@@ -4,8 +4,7 @@ import { hashLabels, type LabelObject } from "./utils.ts";
 export interface CounterConfiguration<L extends string>
 	extends MetricConfiguration<Counter<L>, L> {}
 
-export class Counter<L extends string> extends Metric<Counter<L>, L> {
-	#values = new Map<string, { value: number; labels: LabelObject<L> }>();
+export class Counter<L extends string> extends Metric<Counter<L>, L, { value: number; labels: LabelObject<L> }> {
 
 	/**
 	 * Increment counter
@@ -22,12 +21,12 @@ export class Counter<L extends string> extends Metric<Counter<L>, L> {
 		}
 
 		const hashed = hashLabels(labels);
-		const entry = this.#values.get(hashed);
+		const entry = this.values.get(hashed);
 
 		if (entry) {
 			entry.value += value;
 		} else {
-			this.#values.set(hashed, { value, labels });
+			this.values.set(hashed, { value, labels });
 		}
 	}
 
@@ -41,15 +40,15 @@ export class Counter<L extends string> extends Metric<Counter<L>, L> {
 				this.inc(labels, value);
 			},
 			reset: () => {
-				this.#values.delete(hashLabels(labels));
+				this.values.delete(hashLabels(labels));
 			},
 		};
 	}
 
 	reset() {
-		this.#values.clear();
+		this.values.clear();
 		if (!this.labelNames.length) {
-			this.#values.set(hashLabels({}), { labels: {}, value: 0 }); // todo: is this correct behavior?
+			this.values.set(hashLabels({}), { labels: {}, value: 0 }); // todo: is this correct behavior?
 		}
 	}
 }
