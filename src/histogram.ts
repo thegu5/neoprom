@@ -19,7 +19,7 @@ export class Histogram<L extends string, B extends number> extends Metric<
 			labels: LabelObject<L>;
 		}
 	>();
-	readonly #buckets: readonly number[];
+	readonly #buckets: readonly B[];
 
 	constructor(config: HistogramConfiguration<L, B>) {
 		super(config);
@@ -37,8 +37,7 @@ export class Histogram<L extends string, B extends number> extends Metric<
 	 * Observe a value
 	 * @param value The value to observe
 	 */
-	observe(labels: LabelObject<L>, value: number)  {
-
+	observe(labels: LabelObject<L>, value: number) {
 		const hashed = hashLabels(labels);
 		let entry = this.#values.get(hashed);
 
@@ -54,8 +53,12 @@ export class Histogram<L extends string, B extends number> extends Metric<
 		entry.sum += value;
 		entry.count += 1;
 
-		// todo increment bucketValues aka all of what a histogram does
-		// https://github.com/siimon/prom-client/blob/master/lib/histogram.js#L250
+		const bucket = this.#buckets.find((b) => value <= b);
+
+		if (!bucket) return;
+
+		// idk if this is right
+		entry.bucketValues[bucket] += 1;
 	}
 
 	/**
@@ -80,7 +83,7 @@ export class Histogram<L extends string, B extends number> extends Metric<
 		}
 	}
 
-    // todo: timer things
+	// todo: timer things
 }
 
 function createValueEntry<L extends string, B extends number>(
