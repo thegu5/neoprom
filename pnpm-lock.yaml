@@ -11,6 +11,9 @@ importers:
       '@biomejs/biome':
         specifier: 2.4.14
         version: 2.4.14
+      '@types/node':
+        specifier: ^25.6.0
+        version: 25.6.0
       tsdown:
         specifier: ^0.21.10
         version: 0.21.10(typescript@6.0.3)
@@ -239,6 +242,9 @@ packages:
   '@types/jsesc@2.5.1':
     resolution: {integrity: sha512-9VN+6yxLOPLOav+7PwjZbxiID2bVaeq0ED4qSQmdQTdjnXJSaCVKTR58t15oqH1H5t8Ng2ZX1SabJVoN9Q34bw==}
 
+  '@types/node@25.6.0':
+    resolution: {integrity: sha512-+qIYRKdNYJwY3vRCZMdJbPLJAtGjQBudzZzdzwQYkEPQd+PJGixUL5QfvCLDaULoLv+RhT3LDkwEfKaAkgSmNQ==}
+
   ansis@4.2.0:
     resolution: {integrity: sha512-HqZ5rWlFjGiV0tDm3UxxgNRqsOTniqoKZu0pIAfh7TZQMGuZK+hH0drySty0si0QXj1ieop4+SkSfPZBPPkHig==}
     engines: {node: '>=14'}
@@ -392,6 +398,9 @@ packages:
 
   unconfig-core@7.5.0:
     resolution: {integrity: sha512-Su3FauozOGP44ZmKdHy2oE6LPjk51M/TRRjHv2HNCWiDvfvCoxC2lno6jevMA91MYAdCdwP05QnWdWpSbncX/w==}
+
+  undici-types@7.19.2:
+    resolution: {integrity: sha512-qYVnV5OEm2AW8cJMCpdV20CDyaN3g0AjDlOGf1OW4iaDEx8MwdtChUp4zu4H0VP3nDRF/8RKWH+IPp9uW0YGZg==}
 
   unrun@0.2.37:
     resolution: {integrity: sha512-AA7vDuYsgeSYVzJMm16UKA+aXFKhy7nFqW9z5l7q44K4ppFWZAMqYS58ePRZbugMLPH0fwwMzD5A8nP0avxwZQ==}
@@ -565,6 +574,10 @@ snapshots:
 
   '@types/jsesc@2.5.1': {}
 
+  '@types/node@25.6.0':
+    dependencies:
+      undici-types: 7.19.2
+
   ansis@4.2.0: {}
 
   ast-kit@3.0.0-beta.1:
@@ -697,6 +710,8 @@ snapshots:
     dependencies:
       '@quansync/fs': 1.0.0
       quansync: 1.0.0
+
+  undici-types@7.19.2: {}
 
   unrun@0.2.37:
     dependencies:

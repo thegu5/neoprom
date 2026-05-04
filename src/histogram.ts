@@ -76,14 +76,25 @@ export class Histogram<L extends string, B extends number> extends Metric<
 		};
 	}
 
+	/**
+	 * Start timer to log a duration
+	 * @param startLabels Labels to record the time to
+	 */
+	startTimer(startLabels: LabelObject<L> = {}) {
+		const start = process.hrtime.bigint();
+		return (endLabels: LabelObject<L> = {}) => {
+			const delta = Number((process.hrtime.bigint() - start) / BigInt(1e9));
+			this.observe(Object.assign({}, startLabels, endLabels), delta);
+			return delta;
+		};
+	}
+
 	reset() {
 		this.#values.clear();
 		if (!this.labelNames.length) {
 			this.#values.set(hashLabels({}), createValueEntry(this.#buckets, {})); // todo: is this correct behavior?
 		}
 	}
-
-	// todo: timer things
 }
 
 function createValueEntry<L extends string, B extends number>(
