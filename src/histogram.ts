@@ -3,18 +3,18 @@ import { hashLabels, type LabelObject } from "./utils.ts";
 
 export interface HistogramConfiguration<L extends string, B extends number>
 	extends MetricConfiguration<Histogram<L, B>, L> {
-	buckets: readonly B[];
+	buckets?: readonly B[];
 }
 
 export class Histogram<L extends string, B extends number> extends Metric<
 	Histogram<L, B>,
 	L,
-		{
-			sum: number;
-			count: number;
-			bucketValues: Record<B, number>;
-			labels: LabelObject<L>;
-		}
+	{
+		sum: number;
+		count: number;
+		bucketValues: Record<B, number>;
+		labels: LabelObject<L>;
+	}
 > {
 	readonly #buckets: readonly B[];
 
@@ -27,14 +27,21 @@ export class Histogram<L extends string, B extends number> extends Metric<
 			}
 		}
 
-		this.#buckets = config.buckets;
+		this.#buckets =
+			config.buckets ??
+			([0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10] as B[]);
 	}
 
 	/**
 	 * Observe a value
 	 * @param value The value to observe
 	 */
-	observe(labels: LabelObject<L>, value: number) {
+	observe(value: number): void;
+	observe(labels: LabelObject<L>, value: number): void;
+	observe(param1: LabelObject<L> | number, param2?: number) {
+		const value = (typeof param1 === "object" ? param2 : param1) ?? 0;
+		const labels = typeof param1 === "object" ? param1 : ({} as LabelObject<L>);
+
 		const hashed = hashLabels(labels);
 
 		let entry = this.values.get(hashed);
