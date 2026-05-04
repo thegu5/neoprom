@@ -63,6 +63,8 @@ export class Gauge<L extends string> extends Metric<Gauge<L>, L> {
 	 */
 	reset() {
 		this.#values.clear();
+		if (!this.labelNames.length) {
 		this.#values.set(hashLabels({}), { labels: {}, value: 0 }); // todo: is this correct behavior?
+		}
 	}
 }

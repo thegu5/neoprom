@@ -12,10 +12,12 @@ export interface MetricConfiguration<T extends Metric<T, L>, L extends string> {
 export abstract class Metric<T extends Metric<T, L>, L extends string> {
 	readonly name: string;
 	readonly help: string;
+	readonly labelNames: readonly string[];
 	readonly collect: MetricConfiguration<T, L>["collect"];
 	constructor(config: MetricConfiguration<T, L>) {
 		this.name = config.name;
 		this.help = config.help;
+		this.labelNames = config.labelNames ?? [];
 		this.collect = config.collect;
 	}
 	abstract reset(): void;

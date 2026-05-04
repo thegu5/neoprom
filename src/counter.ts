@@ -52,6 +52,8 @@ export class Counter<L extends string> extends Metric<Counter<L>, L> {
 
 	reset() {
 		this.#values.clear();
+		if (!this.labelNames.length) {
 		this.#values.set(hashLabels({}), { labels: {}, value: 0 }); // todo: is this correct behavior?
+		}
 	}
 }
