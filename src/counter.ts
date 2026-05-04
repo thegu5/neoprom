@@ -1,25 +1,21 @@
 import { Metric, type MetricConfiguration } from "./metric.ts";
-import { hashLabels } from "./utils.ts";
+import { hashLabels, type LabelObject } from "./utils.ts";
 
 export interface CounterConfiguration<L extends string>
 	extends MetricConfiguration<Counter<L>, L> {}
 
 export class Counter<L extends string> extends Metric<Counter<L>, L> {
-	#values = new Map<
-		string,
-		{ value: number; labels: Partial<Record<L, string>> }
-	>();
+	#values = new Map<string, { value: number; labels: LabelObject<L> }>();
 
 	/**
 	 * Increment counter
 	 * @param value The value to increment with
 	 */
-	inc(labels: Partial<Record<L, string>>, value?: number): void;
+	inc(labels: LabelObject<L>, value?: number): void;
 	inc(value?: number): void;
-	inc(param1?: Partial<Record<L, string>> | number, param2?: number) {
+	inc(param1?: LabelObject<L> | number, param2?: number) {
 		const value = (typeof param1 === "object" ? param2 : param1) ?? 1;
-		const labels =
-			typeof param1 === "object" ? param1 : ({} as Partial<Record<L, string>>);
+		const labels = typeof param1 === "object" ? param1 : ({} as LabelObject<L>);
 
 		if (value < 0) {
 			throw new Error("counter cannot decrease");
@@ -39,7 +35,7 @@ export class Counter<L extends string> extends Metric<Counter<L>, L> {
 	 * Get sub-counter for a given set of labels
 	 * @param labels Labels to affect when used
 	 */
-	withLabels(labels: Partial<Record<L, string>>) {
+	withLabels(labels: LabelObject<L>) {
 		return {
 			inc: (value?: number) => {
 				this.inc(labels, value);
@@ -53,7 +49,7 @@ export class Counter<L extends string> extends Metric<Counter<L>, L> {
 	reset() {
 		this.#values.clear();
 		if (!this.labelNames.length) {
-		this.#values.set(hashLabels({}), { labels: {}, value: 0 }); // todo: is this correct behavior?
+			this.#values.set(hashLabels({}), { labels: {}, value: 0 }); // todo: is this correct behavior?
 		}
 	}
 }
