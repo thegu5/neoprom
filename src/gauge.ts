@@ -1,8 +1,5 @@
-import { Metric, type MetricConfiguration } from "./metric.ts";
+import { Metric } from "./metric.ts";
 import { hashLabels, type LabelObject } from "./utils.ts";
-
-export interface GaugeConfiguration<L extends string>
-	extends MetricConfiguration<Gauge<L>, L> {}
 
 export class Gauge<L extends string = string> extends Metric<
 	Gauge<L>,

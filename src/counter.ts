@@ -1,8 +1,5 @@
-import { Metric, type MetricConfiguration } from "./metric.ts";
+import { Metric } from "./metric.ts";
 import { hashLabels, type LabelObject } from "./utils.ts";
-
-export interface CounterConfiguration<L extends string>
-	extends MetricConfiguration<Counter<L>, L> {}
 
 export class Counter<L extends string = string> extends Metric<
 	Counter<L>,
