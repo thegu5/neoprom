@@ -4,8 +4,11 @@ import { hashLabels, type LabelObject } from "./utils.ts";
 export interface CounterConfiguration<L extends string>
 	extends MetricConfiguration<Counter<L>, L> {}
 
-export class Counter<L extends string> extends Metric<Counter<L>, L, { value: number; labels: LabelObject<L> }> {
-
+export class Counter<L extends string = string> extends Metric<
+	Counter<L>,
+	L,
+	{ value: number; labels: LabelObject<L> }
+> {
 	/**
 	 * Increment counter
 	 * @param value The value to increment with

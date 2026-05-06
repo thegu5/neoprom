@@ -4,7 +4,7 @@ import { hashLabels, type LabelObject } from "./utils.ts";
 export interface GaugeConfiguration<L extends string>
 	extends MetricConfiguration<Gauge<L>, L> {}
 
-export class Gauge<L extends string> extends Metric<
+export class Gauge<L extends string = string> extends Metric<
 	Gauge<L>,
 	L,
 	{ value: number; labels: LabelObject<L> }

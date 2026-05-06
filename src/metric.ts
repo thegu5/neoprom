@@ -9,7 +9,11 @@ export interface MetricConfiguration<T extends Metric<T, L>, L extends string> {
 	collect?: CollectFunction<T, L>;
 }
 
-export abstract class Metric<T extends Metric<T, L>, L extends string, V extends object = object> {
+export abstract class Metric<
+	T extends Metric<T, L>,
+	L extends string = string,
+	V extends object = object,
+> {
 	readonly name: string;
 	readonly help: string;
 	readonly labelNames: readonly string[];

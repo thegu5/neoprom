@@ -5,4 +5,4 @@ export function hashLabels(labels: Record<string, string | undefined>) {
 		.join(",");
 }
 
-export type LabelObject<L extends string> = Partial<Record<L, string>>;
+export type LabelObject<L extends string = string> = Partial<Record<L, string>>;

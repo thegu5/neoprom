@@ -6,7 +6,10 @@ export interface HistogramConfiguration<L extends string, B extends number>
 	buckets?: readonly B[];
 }
 
-export class Histogram<L extends string, B extends number> extends Metric<
+export class Histogram<
+	L extends string = string,
+	B extends number = number,
+> extends Metric<
 	Histogram<L, B>,
 	L,
 	{
