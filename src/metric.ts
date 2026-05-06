@@ -28,6 +28,11 @@ export abstract class Metric<
 		this.#collect = config.collect;
 	}
 
+	getValues() {
+		// this might benefit from better naming
+		return this.values.values();
+	}
+
 	collect() {
 		return this.#collect?.call(this as unknown as T);
 	}
