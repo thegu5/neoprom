@@ -17,15 +17,20 @@ export abstract class Metric<
 	readonly name: string;
 	readonly help: string;
 	readonly labelNames: readonly string[];
-	readonly collect: MetricConfiguration<T, L>["collect"];
+	readonly #collect: MetricConfiguration<T, L>["collect"];
 
 	protected values = new Map<string, V>();
-	
+
 	constructor(config: MetricConfiguration<T, L>) {
 		this.name = config.name;
 		this.help = config.help;
 		this.labelNames = config.labelNames ?? [];
-		this.collect = config.collect;
+		this.#collect = config.collect;
 	}
+
+	collect() {
+		return this.#collect?.call(this as unknown as T);
+	}
+
 	abstract reset(): void;
 }
