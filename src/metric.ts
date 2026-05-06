@@ -15,7 +15,7 @@ export abstract class Metric<
 	readonly labelNames: readonly string[];
 	readonly #collect: MetricConfiguration<T, L>["collect"];
 
-	protected values = new Map<string, V>();
+	protected valueMap = new Map<string, V>();
 
 	constructor(config: MetricConfiguration<T, L>) {
 		this.name = config.name;
@@ -25,8 +25,7 @@ export abstract class Metric<
 	}
 
 	getValues() {
-		// this might benefit from better naming
-		return this.values.values();
+		return this.valueMap.values();
 	}
 
 	collect() {

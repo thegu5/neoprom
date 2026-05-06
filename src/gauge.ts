@@ -17,12 +17,12 @@ export class Gauge<L extends string = string> extends Metric<
 		const labels = typeof param1 === "object" ? param1 : ({} as LabelObject<L>);
 
 		const hashed = hashLabels(labels);
-		const entry = this.values.get(hashed);
+		const entry = this.valueMap.get(hashed);
 
 		if (entry) {
 			entry.value += value;
 		} else {
-			this.values.set(hashed, { value, labels });
+			this.valueMap.set(hashed, { value, labels });
 		}
 	}
 
@@ -52,7 +52,7 @@ export class Gauge<L extends string = string> extends Metric<
 				this.dec(labels, value);
 			},
 			reset: () => {
-				this.values.delete(hashLabels(labels));
+				this.valueMap.delete(hashLabels(labels));
 			},
 		};
 	}
@@ -61,9 +61,9 @@ export class Gauge<L extends string = string> extends Metric<
 	 * Reset the gauge
 	 */
 	reset() {
-		this.values.clear();
+		this.valueMap.clear();
 		if (!this.labelNames.length) {
-			this.values.set(hashLabels({}), { labels: {}, value: 0 }); // todo: is this correct behavior?
+			this.valueMap.set(hashLabels({}), { labels: {}, value: 0 }); // todo: is this correct behavior?
 		}
 	}
 }

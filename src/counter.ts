@@ -21,12 +21,12 @@ export class Counter<L extends string = string> extends Metric<
 		}
 
 		const hashed = hashLabels(labels);
-		const entry = this.values.get(hashed);
+		const entry = this.valueMap.get(hashed);
 
 		if (entry) {
 			entry.value += value;
 		} else {
-			this.values.set(hashed, { value, labels });
+			this.valueMap.set(hashed, { value, labels });
 		}
 	}
 
@@ -40,15 +40,15 @@ export class Counter<L extends string = string> extends Metric<
 				this.inc(labels, value);
 			},
 			reset: () => {
-				this.values.delete(hashLabels(labels));
+				this.valueMap.delete(hashLabels(labels));
 			},
 		};
 	}
 
 	reset() {
-		this.values.clear();
+		this.valueMap.clear();
 		if (!this.labelNames.length) {
-			this.values.set(hashLabels({}), { labels: {}, value: 0 }); // todo: is this correct behavior?
+			this.valueMap.set(hashLabels({}), { labels: {}, value: 0 }); // todo: is this correct behavior?
 		}
 	}
 }

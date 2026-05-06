@@ -18,11 +18,13 @@ export class Registry {
 		this.contentType = contentType;
 	}
 
-	registerMetric<T extends MetricUnion>(metric: T) {
-		if (this.#metrics.has(metric.name)) {
-			throw new Error("metric with same name already exists");
+	register(...metrics: MetricUnion[]) {
+		for (const metric of metrics) {
+			if (this.#metrics.has(metric.name)) {
+				throw new Error("metric with same name already exists");
+			}
+			this.#metrics.set(metric.name, metric);
 		}
-		this.#metrics.set(metric.name, metric);
 	}
 
 	resetMetrics() {

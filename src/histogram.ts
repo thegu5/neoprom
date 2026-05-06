@@ -47,10 +47,10 @@ export class Histogram<
 
 		const hashed = hashLabels(labels);
 
-		let entry = this.values.get(hashed);
+		let entry = this.valueMap.get(hashed);
 		if (!entry) {
 			entry = createValueEntry(this.#buckets, labels);
-			this.values.set(hashed, entry);
+			this.valueMap.set(hashed, entry);
 		}
 
 		if (!Number.isFinite(value)) {
@@ -78,7 +78,7 @@ export class Histogram<
 				this.observe(labels, value);
 			},
 			reset: () => {
-				this.values.delete(hashLabels(labels));
+				this.valueMap.delete(hashLabels(labels));
 			},
 		};
 	}
@@ -97,9 +97,9 @@ export class Histogram<
 	}
 
 	reset() {
-		this.values.clear();
+		this.valueMap.clear();
 		if (!this.labelNames.length) {
-			this.values.set(hashLabels({}), createValueEntry(this.#buckets, {})); // todo: is this correct behavior?
+			this.valueMap.set(hashLabels({}), createValueEntry(this.#buckets, {})); // todo: is this correct behavior?
 		}
 	}
 }
