@@ -90,7 +90,7 @@ export class Histogram<
 	startTimer(startLabels: LabelObject<L> = {}) {
 		const start = process.hrtime.bigint();
 		return (endLabels: LabelObject<L> = {}) => {
-			const delta = Number((process.hrtime.bigint() - start) / BigInt(1e9));
+			const delta = Number(process.hrtime.bigint() - start);
 			this.observe(Object.assign({}, startLabels, endLabels), delta);
 			return delta;
 		};
