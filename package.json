@@ -6,7 +6,7 @@
 	"license": "MIT",
 	"homepage": "https://github.com/thegu5/neoprom",
 	"bugs": {
-		"url": "https://github.com/thegu5/krapi/issues"
+		"url": "https://github.com/thegu5/neoprom/issues"
 	},
 	"repository": "git+https://github.com/thegu5/neoprom.git",
 	"type": "module",
