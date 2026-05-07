@@ -50,9 +50,12 @@ export class Registry {
 
 		// https://prometheus.io/docs/instrumenting/exposition_formats/#comments-help-text-and-type-information
 		for (const metric of this.#metrics.values()) {
-			// todo: how are metric types in comments escaped?
-			result += `# HELP ${metric.name} ${metric.help.replaceAll("\\", "\\\\").replaceAll("\n", "\\n")}\n`;
-			result += `# TYPE ${metric.name} ${metric.constructor.name.toLowerCase()}\n`;
+			// metric is empty
+			if (!metric.getValues().toArray().length) continue;
+
+			// todo: how are metric names in comments escaped?
+			result += `# HELP ${escapeIfRequired(metric.name)} ${metric.help.replaceAll("\\", "\\\\").replaceAll("\n", "\\n")}\n`;
+			result += `# TYPE ${escapeIfRequired(metric.name)} ${metric.constructor.name.toLowerCase()}\n`;
 
 			if (metric instanceof Counter || metric instanceof Gauge) {
 				for (const val of metric.getValues()) {
@@ -71,10 +74,12 @@ export class Registry {
 
 function getMetricLine(name: string, value: unknown, labels: LabelObject) {
 	const altFormat = requiresEscaping(name);
+	const bracketEntries = getLabelPairs(labels);
+	if (altFormat) bracketEntries.unshift(escapeIdentifier(name))
 	let result = "";
 	result += altFormat ? "" : name;
-	if (Object.values(labels).filter((v) => v !== undefined).length) {
-		result += `{${altFormat ? `"${escapeIdentifier(name)},"` : ""}${getLabelPairs(labels)}}`;
+	if (bracketEntries.length) {
+		result += `{${bracketEntries.join(",")}}`;
 	}
 	result += ` ${value}\n`;
 	return result;
@@ -86,10 +91,10 @@ function getLabelPairs(labels: LabelObject) {
 		.map(
 			([labelName, labelValue]) =>
 				`${escapeIfRequired(labelName)}=${escapeIdentifier(labelValue)}`,
-		)
-		.join(",");
+		);
 }
 
+// todo: label names can't have colons?
 function requiresEscaping(identifier: string) {
 	return !/^[a-zA-Z_:][a-zA-Z0-9_:]*$/.test(identifier);
 }
