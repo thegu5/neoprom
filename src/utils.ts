@@ -13,7 +13,7 @@ export function startTimer<L extends string>(
 ) {
 	const start = process.hrtime.bigint();
 	return (endLabels: LabelObject<L> = {}) => {
-		const delta = Number((process.hrtime.bigint() - start) / BigInt(1e9));
+		const delta = Number(process.hrtime.bigint() - start) / 1e9;
 		collectFunction(Object.assign({}, startLabels, endLabels), delta);
 		return delta;
 	};
