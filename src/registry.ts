@@ -1,6 +1,6 @@
 import { Counter } from "./counter.ts";
 import { Gauge } from "./gauge.ts";
-import type { Histogram } from "./histogram.ts";
+import { Histogram } from "./histogram.ts";
 import type { LabelObject } from "./utils.ts";
 
 export const RegistryContentType = {
@@ -61,10 +61,19 @@ export class Registry {
 				for (const val of metric.getValues()) {
 					result += getMetricLine(metric.name, val.value, val.labels);
 				}
+			} else if (metric instanceof Histogram) {
+				for (const val of metric.getValues()) {
+					for (const [bucket, count] of Object.entries(val.bucketValues).sort(([a], [b]) => parseInt(a, 10) - parseInt(b, 10))) {
+						result += getMetricLine(metric.name, count, Object.assign({ le: bucket }, val.labels))
+					}
+					result += getMetricLine(`${metric.name}_sum`, val.sum, val.labels);
+					result += getMetricLine(`${metric.name}_count`, val.count, val.labels);
+				}
 			} else {
-				throw new Error(
-					`${metric.constructor.name} metric type not fully implemented`,
-				);
+				// (currently) unreachable
+				// throw new Error(
+				// 	`${metric.constructor.name} metric type not fully implemented`,
+				// );
 			}
 		}
 
