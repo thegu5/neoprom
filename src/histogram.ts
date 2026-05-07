@@ -1,5 +1,5 @@
 import { Metric, type MetricConfiguration } from "./metric.ts";
-import { hashLabels, type LabelObject } from "./utils.ts";
+import { hashLabels, type LabelObject, startTimer } from "./utils.ts";
 
 export interface HistogramConfiguration<L extends string, B extends number>
 	extends MetricConfiguration<Histogram<L, B>, L> {
@@ -88,12 +88,7 @@ export class Histogram<
 	 * @param startLabels Labels to record the time to
 	 */
 	startTimer(startLabels: LabelObject<L> = {}) {
-		const start = process.hrtime.bigint();
-		return (endLabels: LabelObject<L> = {}) => {
-			const delta = Number(process.hrtime.bigint() - start);
-			this.observe(Object.assign({}, startLabels, endLabels), delta);
-			return delta;
-		};
+		return startTimer(this.observe, startLabels);
 	}
 
 	reset() {

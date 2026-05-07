@@ -1,5 +1,5 @@
 import { Metric } from "./metric.ts";
-import { hashLabels, type LabelObject } from "./utils.ts";
+import { hashLabels, type LabelObject, startTimer } from "./utils.ts";
 
 export class Gauge<L extends string = string> extends Metric<
 	Gauge<L>,
@@ -37,6 +37,45 @@ export class Gauge<L extends string = string> extends Metric<
 		const labels = typeof param1 === "object" ? param1 : ({} as LabelObject<L>);
 
 		return this.inc(labels, -value);
+	}
+
+	/**
+	 * Set gauge
+	 * @param value The value to increment with
+	 */
+	set(labels: LabelObject<L>, value?: number): void;
+	set(value?: number): void;
+	set(param1?: LabelObject<L> | number, param2?: number) {
+		const value = (typeof param1 === "object" ? param2 : param1) ?? 1;
+		const labels = typeof param1 === "object" ? param1 : ({} as LabelObject<L>);
+
+		const hashed = hashLabels(labels);
+		const entry = this.valueMap.get(hashed);
+
+		if (entry) {
+			entry.value = value;
+		} else {
+			this.valueMap.set(hashed, { value, labels });
+		}
+	}
+
+	setToCurrentTime(): void;
+	setToCurrentTime(labels: LabelObject<L>): void;
+	setToCurrentTime(labels?: LabelObject<L>) {
+		const now = Date.now() / 1000;
+		if (labels) {
+			this.set(labels, now);
+		} else {
+			this.set(now);
+		}
+	}
+
+	/**
+	 * Start timer to log a duration
+	 * @param startLabels Labels to record the time to
+	 */
+	startTimer(startLabels: LabelObject<L> = {}) {
+		return startTimer(this.set, startLabels);
 	}
 
 	/**

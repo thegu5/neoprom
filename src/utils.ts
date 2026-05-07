@@ -6,3 +6,15 @@ export function hashLabels(labels: Record<string, string | undefined>) {
 }
 
 export type LabelObject<L extends string = string> = Partial<Record<L, string>>;
+
+export function startTimer<L extends string>(
+	collectFunction: (labels: LabelObject<L>, value: number) => void,
+	startLabels: LabelObject<L> = {},
+) {
+	const start = process.hrtime.bigint();
+	return (endLabels: LabelObject<L> = {}) => {
+		const delta = Number((process.hrtime.bigint() - start) / BigInt(1e9));
+		collectFunction(Object.assign({}, startLabels, endLabels), delta);
+		return delta;
+	};
+}
