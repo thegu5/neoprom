@@ -1,5 +1,10 @@
 import { Metric, type MetricConfiguration } from "./metric.ts";
-import { hashLabels, type LabelObject, startTimer } from "./utils.ts";
+import {
+	hashLabels,
+	type LabelObject,
+	parseMetricParams,
+	startTimer,
+} from "./utils.ts";
 
 export interface HistogramConfiguration<L extends string, B extends number>
 	extends MetricConfiguration<Histogram<L, B>, L> {
@@ -42,8 +47,7 @@ export class Histogram<
 	observe(value: number): void;
 	observe(labels: LabelObject<L>, value: number): void;
 	observe(param1: LabelObject<L> | number, param2?: number) {
-		const value = (typeof param1 === "object" ? param2 : param1) ?? 0;
-		const labels = typeof param1 === "object" ? param1 : ({} as LabelObject<L>);
+		const [value, labels] = parseMetricParams(param1, param2, 0);
 
 		const hashed = hashLabels(labels);
 

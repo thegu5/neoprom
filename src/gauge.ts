@@ -1,5 +1,10 @@
 import { Metric } from "./metric.ts";
-import { hashLabels, type LabelObject, startTimer } from "./utils.ts";
+import {
+	hashLabels,
+	type LabelObject,
+	parseMetricParams,
+	startTimer,
+} from "./utils.ts";
 
 export class Gauge<L extends string = string> extends Metric<
 	Gauge<L>,
@@ -13,8 +18,7 @@ export class Gauge<L extends string = string> extends Metric<
 	inc(labels: LabelObject<L>, value?: number): void;
 	inc(value?: number): void;
 	inc(param1?: LabelObject<L> | number, param2?: number) {
-		const value = (typeof param1 === "object" ? param2 : param1) ?? 1;
-		const labels = typeof param1 === "object" ? param1 : ({} as LabelObject<L>);
+		const [value, labels] = parseMetricParams(param1, param2, 1);
 
 		const hashed = hashLabels(labels);
 		const entry = this.valueMap.get(hashed);
@@ -33,8 +37,7 @@ export class Gauge<L extends string = string> extends Metric<
 	dec(labels: LabelObject<L>, value?: number): void;
 	dec(value?: number): void;
 	dec(param1?: LabelObject<L> | number, param2?: number) {
-		const value = (typeof param1 === "object" ? param2 : param1) ?? 1;
-		const labels = typeof param1 === "object" ? param1 : ({} as LabelObject<L>);
+		const [value, labels] = parseMetricParams(param1, param2, 1);
 
 		return this.inc(labels, -value);
 	}
@@ -46,8 +49,7 @@ export class Gauge<L extends string = string> extends Metric<
 	set(labels: LabelObject<L>, value?: number): void;
 	set(value?: number): void;
 	set(param1?: LabelObject<L> | number, param2?: number) {
-		const value = (typeof param1 === "object" ? param2 : param1) ?? 1;
-		const labels = typeof param1 === "object" ? param1 : ({} as LabelObject<L>);
+		const [value, labels] = parseMetricParams(param1, param2, 1);
 
 		const hashed = hashLabels(labels);
 		const entry = this.valueMap.get(hashed);

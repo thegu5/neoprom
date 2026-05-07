@@ -7,6 +7,16 @@ export function hashLabels(labels: Record<string, string | undefined>) {
 
 export type LabelObject<L extends string = string> = Partial<Record<L, string>>;
 
+export function parseMetricParams<L extends string>(
+	param1: LabelObject<L> | number | undefined,
+	param2: number | undefined,
+	defaultValue: number,
+) {
+	const value = (typeof param1 === "object" ? param2 : param1) ?? defaultValue;
+	const labels = typeof param1 === "object" ? param1 : ({} as LabelObject<L>);
+	return [value, labels] as const;
+}
+
 export function startTimer<L extends string>(
 	collectFunction: (labels: LabelObject<L>, value: number) => void,
 	startLabels: LabelObject<L> = {},
