@@ -63,11 +63,21 @@ export class Registry {
 				}
 			} else if (metric instanceof Histogram) {
 				for (const val of metric.getValues()) {
-					for (const [bucket, count] of Object.entries(val.bucketValues).sort(([a], [b]) => parseInt(a, 10) - parseInt(b, 10))) {
-						result += getMetricLine(metric.name, count, Object.assign({ le: bucket }, val.labels))
+					for (const [bucket, count] of Object.entries(val.bucketValues).sort(
+						([a], [b]) => parseInt(a, 10) - parseInt(b, 10),
+					)) {
+						result += getMetricLine(
+							metric.name,
+							count,
+							Object.assign({ le: bucket }, val.labels),
+						);
 					}
 					result += getMetricLine(`${metric.name}_sum`, val.sum, val.labels);
-					result += getMetricLine(`${metric.name}_count`, val.count, val.labels);
+					result += getMetricLine(
+						`${metric.name}_count`,
+						val.count,
+						val.labels,
+					);
 				}
 			} else {
 				// (currently) unreachable
@@ -84,7 +94,7 @@ export class Registry {
 function getMetricLine(name: string, value: unknown, labels: LabelObject) {
 	const altFormat = requiresEscaping(name);
 	const bracketEntries = getLabelPairs(labels);
-	if (altFormat) bracketEntries.unshift(escapeIdentifier(name))
+	if (altFormat) bracketEntries.unshift(escapeIdentifier(name));
 	let result = "";
 	result += altFormat ? "" : name;
 	if (bracketEntries.length) {
