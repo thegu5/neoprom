@@ -1,6 +1,8 @@
-import { Counter } from "./counter.ts";
-import { Gauge } from "./gauge.ts";
-import { Histogram } from "./histogram.ts";
+import type { Counter } from "./counter.ts";
+import type { Gauge } from "./gauge.ts";
+import type { Histogram } from "./histogram.ts";
+import type { Metric } from "./metric.ts";
+import { getSymbol } from "./symbols.ts";
 import type { LabelObject } from "./utils.ts";
 
 export const RegistryContentType = {
@@ -8,17 +10,15 @@ export const RegistryContentType = {
 	OpenMetrics: "application/openmetrics-text; version=1.0.0; charset=utf-8",
 } as const;
 
-type MetricUnion = Counter | Gauge | Histogram;
-
 export class Registry {
 	readonly contentType: keyof typeof RegistryContentType;
-	#metrics = new Map<string, MetricUnion>();
+	#metrics = new Map<string, Metric>();
 
 	constructor(contentType: keyof typeof RegistryContentType = "Prometheus") {
 		this.contentType = contentType;
 	}
 
-	register(...metrics: MetricUnion[]) {
+	register(...metrics: Metric[]) {
 		for (const metric of metrics) {
 			if (this.#metrics.has(metric.name)) {
 				throw new Error("metric with same name already exists");
@@ -57,12 +57,15 @@ export class Registry {
 			result += `# HELP ${escapeIfRequired(metric.name)} ${metric.help.replaceAll("\\", "\\\\").replaceAll("\n", "\\n")}\n`;
 			result += `# TYPE ${escapeIfRequired(metric.name)} ${metric.constructor.name.toLowerCase()}\n`;
 
-			if (metric instanceof Counter || metric instanceof Gauge) {
-				for (const val of metric.getValues()) {
+			if (
+				metric.type === getSymbol("Counter") ||
+				metric.type === getSymbol("Gauge")
+			) {
+				for (const val of (metric as Counter | Gauge).getValues()) {
 					result += getMetricLine(metric.name, val.value, val.labels);
 				}
-			} else if (metric instanceof Histogram) {
-				for (const val of metric.getValues()) {
+			} else if (metric.type === getSymbol("Histogram")) {
+				for (const val of (metric as Histogram).getValues()) {
 					for (const [bucket, count] of Object.entries(val.bucketValues).sort(
 						([a], [b]) => parseInt(a, 10) - parseInt(b, 10),
 					)) {
@@ -130,3 +133,5 @@ function escapeIfRequired(identifier: string) {
 		? escapeIdentifier(identifier)
 		: identifier;
 }
+
+export const globalRegistry = new Registry();
