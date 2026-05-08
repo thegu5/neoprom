@@ -14,7 +14,7 @@ export class Registry {
 	readonly contentType: keyof typeof RegistryContentType;
 	#metrics = new Map<string, MetricUnion>();
 
-	constructor(contentType: keyof typeof RegistryContentType = "OpenMetrics") {
+	constructor(contentType: keyof typeof RegistryContentType = "Prometheus") {
 		this.contentType = contentType;
 	}
 
