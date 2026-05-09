@@ -29,7 +29,8 @@ export function startTimer<L extends string>(
 	};
 }
 
-// horror. (todo: can the typing here be cleaned up...?)
+// horror.
+// TODO: can the typing here be cleaned up...?
 export function createHook<L extends string>(
 	startHook: (labels: LabelObject<L>) => () => void,
 	options?: { includeExceptions?: boolean },
@@ -78,7 +79,7 @@ export function createHook<L extends string>(
 		) =>
 			function (this: T, ...args: R) {
 				const endHook = startHook({
-					method: String(context.name), // todo: is this a good idea?
+					method: String(context.name), // TODO: is this a good idea?
 					...labels,
 				} as LabelObject<L>);
 				try {

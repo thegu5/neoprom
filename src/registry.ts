@@ -53,7 +53,7 @@ export class Registry {
 			// metric is empty
 			if (!metric.getValues().toArray().length) continue;
 
-			// todo: how are metric names in comments escaped?
+			// TODO: how are metric names in comments escaped?
 			result += `# HELP ${escapeIfRequired(metric.name)} ${metric.help.replaceAll("\\", "\\\\").replaceAll("\n", "\\n")}\n`;
 			result += `# TYPE ${escapeIfRequired(metric.name)} ${metric.constructor.name.toLowerCase()}\n`;
 
@@ -116,7 +116,7 @@ function getLabelPairs(labels: LabelObject) {
 		);
 }
 
-// todo: label names can't have colons?
+// TODO: label names can't have colons?
 function requiresEscaping(identifier: string) {
 	return !/^[a-zA-Z_:][a-zA-Z0-9_:]*$/.test(identifier);
 }

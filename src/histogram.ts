@@ -113,7 +113,7 @@ export class Histogram<
 	reset() {
 		this.valueMap.clear();
 		if (!this.labelNames.length) {
-			this.valueMap.set(hashLabels({}), createValueEntry(this.#buckets, {})); // todo: is this correct behavior?
+			this.valueMap.set(hashLabels({}), createValueEntry(this.#buckets, {})); // TODO: is this correct behavior?
 		}
 	}
 }

@@ -106,12 +106,15 @@ export class Gauge<L extends string = string> extends Metric<
 	 * }
 	 * ```
 	 */
-	trackInProgress = createHook((labels: LabelObject<L> = {}) => {
-		this.inc(labels, 1);
-		return () => {
-			this.dec(labels, 1);
-		}
-	}, { includeExceptions: true })
+	trackInProgress = createHook(
+		(labels: LabelObject<L> = {}) => {
+			this.inc(labels, 1);
+			return () => {
+				this.dec(labels, 1);
+			};
+		},
+		{ includeExceptions: true },
+	);
 
 	/**
 	 * Get sub-gauge for a given set of labels
@@ -137,7 +140,7 @@ export class Gauge<L extends string = string> extends Metric<
 	reset() {
 		this.valueMap.clear();
 		if (!this.labelNames.length) {
-			this.valueMap.set(hashLabels({}), { labels: {}, value: 0 }); // todo: is this correct behavior?
+			this.valueMap.set(hashLabels({}), { labels: {}, value: 0 }); // TODO: is this correct behavior?
 		}
 	}
 }

@@ -7,7 +7,7 @@ import { globalRegistry } from "../src/registry.ts";
 describe("Registry", () => {
 	beforeEach(() => {
 		globalRegistry.clear();
-	})
+	});
 	it("works? (temporary test)", async () => {
 		const testCounter = new Counter({
 			name: `test

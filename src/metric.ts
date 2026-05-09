@@ -10,7 +10,7 @@ export interface MetricConfiguration<T extends Metric<T, L>, L extends string> {
 }
 
 export abstract class Metric<
-	// biome-ignore lint/suspicious/noExplicitAny: todo: figure out a better way to deal with weird self-referential types
+	// biome-ignore lint/suspicious/noExplicitAny: TODO: figure out a better way to deal with weird self-referential types
 	T extends Metric<T, L> = any,
 	L extends string = string,
 	V extends object = object,
@@ -31,7 +31,7 @@ export abstract class Metric<
 
 		this.type = getSymbol(this.constructor.name);
 
-		const registries = config.registries ?? [ globalRegistry ];
+		const registries = config.registries ?? [globalRegistry];
 		for (const registry of registries) {
 			registry.register(this);
 		}
