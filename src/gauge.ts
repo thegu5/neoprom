@@ -1,5 +1,6 @@
 import { Metric } from "./metric.ts";
 import {
+	createMeasure,
 	hashLabels,
 	type LabelObject,
 	parseMetricParams,
@@ -79,6 +80,20 @@ export class Gauge<L extends string = string> extends Metric<
 	startTimer(startLabels: LabelObject<L> = {}) {
 		return startTimer(this.set, startLabels);
 	}
+
+	// TODO: @overload tag
+	/**
+	 * Sets the gauge to how long a function takes to execute. It can be used in two ways:
+	 * @example
+	 * ```typescript
+	 * let result = gauge.measure(doComputation, labels)(...args);
+	 * class Foo {
+	 * 	⁣@gauge.measure(labels)
+	 * 	doComputation() { }
+	 * }
+	 * ```
+	 */
+	measure = createMeasure(this);
 
 	/**
 	 * Get sub-gauge for a given set of labels

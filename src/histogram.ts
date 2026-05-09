@@ -1,5 +1,6 @@
 import { Metric, type MetricConfiguration } from "./metric.ts";
 import {
+	createMeasure,
 	hashLabels,
 	type LabelObject,
 	parseMetricParams,
@@ -94,6 +95,20 @@ export class Histogram<
 	startTimer(startLabels: LabelObject<L> = {}) {
 		return startTimer(this.observe, startLabels);
 	}
+
+	// TODO: @overload tag
+	/**
+	 * Observes how long a function takes to execute. It can be used in two ways:
+	 * @example
+	 * ```typescript
+	 * let result = histogram.measure(doComputation, labels)(...args);
+	 * class Foo {
+	 * 	⁣@histogram.measure(labels)
+	 * 	doComputation() { }
+	 * }
+	 * ```
+	 */
+	measure = createMeasure(this);
 
 	reset() {
 		this.valueMap.clear();

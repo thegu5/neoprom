@@ -28,3 +28,61 @@ export function startTimer<L extends string>(
 		return delta;
 	};
 }
+
+interface Measurable<L extends string> {
+	startTimer(labels: LabelObject<L>): () => void;
+}
+
+// horror. (todo: can the typing here be cleaned up...?)
+export function createMeasure<L extends string>(self: Measurable<L>) {
+	function measure<
+		F extends (this: T, ...args: R) => unknown,
+		R extends unknown[],
+		T,
+	>(fn: F): F;
+	function measure<
+		F extends (this: T, ...args: R) => unknown,
+		R extends unknown[],
+		T,
+	>(labels: LabelObject<L>, fn: F): F;
+	function measure(
+		labels?: LabelObject<L>,
+	): <T, R extends unknown[]>(
+		target: (this: T, ...args: R) => unknown,
+		context: ClassMethodDecoratorContext,
+	) => (this: T, ...args: R) => unknown;
+	function measure(
+		param1?: LabelObject<L> | ((...args: unknown[]) => unknown),
+		param2?: (...args: unknown[]) => unknown,
+	) {
+		const isWrapperMode =
+			typeof param1 === "function" || typeof param2 === "function";
+		const labels = (typeof param1 === "object" ? param1 : {}) as LabelObject<L>;
+
+		if (isWrapperMode) {
+			// biome-ignore lint/style/noNonNullAssertion: the overload sufficiently narrows this
+			const func = typeof param1 === "function" ? param1 : param2!;
+			return function (this: unknown, ...args: unknown[]) {
+				const stopTimer = self.startTimer(labels);
+				const result = func.call(this, ...args);
+				stopTimer();
+				return result;
+			};
+		}
+
+		return <T, R extends unknown[]>(
+			target: (this: T, ...args: R) => unknown,
+			context: ClassMethodDecoratorContext,
+		) => function (this: T, ...args: R) {
+				const stopTimer = self.startTimer({
+					method: String(context.name),
+					...labels,
+				} as LabelObject<L>);
+				const result = target.call(this, ...args);
+				stopTimer();
+				return result;
+			};
+	}
+
+	return measure;
+}
