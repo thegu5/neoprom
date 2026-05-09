@@ -29,29 +29,28 @@ export function startTimer<L extends string>(
 	};
 }
 
-interface Measurable<L extends string> {
-	startTimer(labels: LabelObject<L>): () => void;
-}
-
 // horror. (todo: can the typing here be cleaned up...?)
-export function createMeasure<L extends string>(self: Measurable<L>) {
-	function measure<
+export function createHook<L extends string>(
+	startHook: (labels: LabelObject<L>) => () => void,
+	options?: { includeExceptions?: boolean },
+) {
+	function wrapper<
 		F extends (this: T, ...args: R) => unknown,
 		R extends unknown[],
 		T,
 	>(fn: F): F;
-	function measure<
+	function wrapper<
 		F extends (this: T, ...args: R) => unknown,
 		R extends unknown[],
 		T,
 	>(labels: LabelObject<L>, fn: F): F;
-	function measure(
+	function wrapper(
 		labels?: LabelObject<L>,
 	): <T, R extends unknown[]>(
 		target: (this: T, ...args: R) => unknown,
 		context: ClassMethodDecoratorContext,
 	) => (this: T, ...args: R) => unknown;
-	function measure(
+	function wrapper(
 		param1?: LabelObject<L> | ((...args: unknown[]) => unknown),
 		param2?: (...args: unknown[]) => unknown,
 	) {
@@ -63,26 +62,33 @@ export function createMeasure<L extends string>(self: Measurable<L>) {
 			// biome-ignore lint/style/noNonNullAssertion: the overload sufficiently narrows this
 			const func = typeof param1 === "function" ? param1 : param2!;
 			return function (this: unknown, ...args: unknown[]) {
-				const stopTimer = self.startTimer(labels);
-				const result = func.call(this, ...args);
-				stopTimer();
-				return result;
+				const endHook = startHook(labels);
+				try {
+					const result = func.call(this, ...args);
+					return result;
+				} finally {
+					if (options?.includeExceptions) endHook();
+				}
 			};
 		}
 
 		return <T, R extends unknown[]>(
 			target: (this: T, ...args: R) => unknown,
 			context: ClassMethodDecoratorContext,
-		) => function (this: T, ...args: R) {
-				const stopTimer = self.startTimer({
-					method: String(context.name),
+		) =>
+			function (this: T, ...args: R) {
+				const endHook = startHook({
+					method: String(context.name), // todo: is this a good idea?
 					...labels,
 				} as LabelObject<L>);
-				const result = target.call(this, ...args);
-				stopTimer();
-				return result;
+				try {
+					const result = target.call(this, ...args);
+					return result;
+				} finally {
+					if (options?.includeExceptions) endHook();
+				}
 			};
 	}
 
-	return measure;
+	return wrapper;
 }

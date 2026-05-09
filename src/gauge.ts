@@ -1,6 +1,6 @@
 import { Metric } from "./metric.ts";
 import {
-	createMeasure,
+	createHook,
 	hashLabels,
 	type LabelObject,
 	parseMetricParams,
@@ -86,14 +86,32 @@ export class Gauge<L extends string = string> extends Metric<
 	 * Sets the gauge to how long a function takes to execute. It can be used in two ways:
 	 * @example
 	 * ```typescript
-	 * let result = gauge.measure(doComputation, labels)(...args);
+	 * let result = gauge.time(doComputation, labels)(...args);
 	 * class Foo {
-	 * 	⁣@gauge.measure(labels)
+	 * 	⁣@gauge.time(labels)
 	 * 	doComputation() { }
 	 * }
 	 * ```
 	 */
-	measure = createMeasure(this);
+	time = createHook(this.startTimer);
+
+	/**
+	 * Increment the gauge when a function or class method is entered, and decrement it when exited.
+	 * @example
+	 * ```typescript
+	 * let result = gauge.trackInProgress(someDatabaseCall, labels)(...args);
+	 * class Foo {
+	 * 	⁣@gauge.trackInProgress(labels)
+	 * 	someDatabaseCall() { }
+	 * }
+	 * ```
+	 */
+	trackInProgress = createHook((labels: LabelObject<L> = {}) => {
+		this.inc(labels, 1);
+		return () => {
+			this.dec(labels, 1);
+		}
+	}, { includeExceptions: true })
 
 	/**
 	 * Get sub-gauge for a given set of labels

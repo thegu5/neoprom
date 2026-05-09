@@ -1,6 +1,6 @@
 import { Metric, type MetricConfiguration } from "./metric.ts";
 import {
-	createMeasure,
+	createHook,
 	hashLabels,
 	type LabelObject,
 	parseMetricParams,
@@ -101,14 +101,14 @@ export class Histogram<
 	 * Observes how long a function takes to execute. It can be used in two ways:
 	 * @example
 	 * ```typescript
-	 * let result = histogram.measure(doComputation, labels)(...args);
+	 * let result = histogram.time(doComputation, labels)(...args);
 	 * class Foo {
-	 * 	⁣@histogram.measure(labels)
+	 * 	⁣@histogram.time(labels)
 	 * 	doComputation() { }
 	 * }
 	 * ```
 	 */
-	measure = createMeasure(this);
+	time = createHook(this.startTimer);
 
 	reset() {
 		this.valueMap.clear();
