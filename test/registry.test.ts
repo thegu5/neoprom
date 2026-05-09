@@ -1,10 +1,13 @@
-import { describe, it } from "node:test";
+import { beforeEach, describe, it } from "node:test";
 import { Counter } from "../src/counter.ts";
 import { Histogram } from "../src/histogram.ts";
 import { globalRegistry } from "../src/registry.ts";
 
 // none of these are actual tests yet, need to do assertions
 describe("Registry", () => {
+	beforeEach(() => {
+		globalRegistry.clear();
+	})
 	it("works? (temporary test)", async () => {
 		const testCounter = new Counter({
 			name: `test
