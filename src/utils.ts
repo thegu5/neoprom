@@ -47,10 +47,10 @@ export function createHook<L extends string>(
 	>(labels: LabelObject<L>, fn: F): F;
 	function wrapper(
 		labels?: LabelObject<L>,
-	): <T, R extends unknown[]>(
-		target: (this: T, ...args: R) => unknown,
-		context: ClassMethodDecoratorContext,
-	) => (this: T, ...args: R) => unknown;
+	): <T, R extends unknown[], V>(
+		target: (this: T, ...args: R) => V,
+		context: ClassMethodDecoratorContext<T, (this: T, ...args: R) => V>,
+	) => (this: T, ...args: R) => V;
 	function wrapper(
 		param1?: LabelObject<L> | ((...args: unknown[]) => unknown),
 		param2?: (...args: unknown[]) => unknown,
@@ -73,11 +73,11 @@ export function createHook<L extends string>(
 			};
 		}
 
-		return <T, R extends unknown[]>(
-			target: (this: T, ...args: R) => unknown,
-			context: ClassMethodDecoratorContext,
+		return <T, R extends unknown[], V>(
+			target: (this: T, ...args: R) => V,
+			context: ClassMethodDecoratorContext<T, (this: T, ...args: R) => V>,
 		) =>
-			function (this: T, ...args: R) {
+			function (this: T, ...args: R): V {
 				const endHook = startHook({
 					method: String(context.name), // TODO: is this a good idea?
 					...labels,
