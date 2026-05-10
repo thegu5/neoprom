@@ -111,7 +111,11 @@ export class Registry {
 	}
 }
 
-function getMetricLine(name: string, value: number | string, labels: LabelObject) {
+function getMetricLine(
+	name: string,
+	value: number | string,
+	labels: LabelObject,
+) {
 	const altFormat = requiresEscaping(name);
 	const bracketEntries = getLabelPairs(labels);
 	if (altFormat) bracketEntries.unshift(escapeIdentifier(name));
