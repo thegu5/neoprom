@@ -4,6 +4,13 @@
 // TODO: double-check "Count MUST include the +Inf bucket"
 // https://prometheus.io/docs/instrumenting/writing_clientlibs/#histogram
 
+/**
+ * Create an array with equal spacing between the elements.
+ * @param start The first value in the array
+ * @param width The spacing between the elements
+ * @param count The number of items in array
+ * @returns An array with the requested number of elements
+ */
 export function linearBuckets(start: number, width: number, count: number) {
 	// assert(count >= 1, "Linear buckets needs a positive count");
 	if (count < 1) {
@@ -13,6 +20,13 @@ export function linearBuckets(start: number, width: number, count: number) {
 	return Array.from({ length: count }, (_, i) => start + i * width);
 }
 
+/**
+ * Create an array that grows exponentially.
+ * @param start The first value in the array
+ * @param factor The exponential factor
+ * @param count The number of items in array
+ * @returns An array with the requested number of elements
+ */
 export function exponentialBuckets(
 	start: number,
 	factor: number,

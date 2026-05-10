@@ -46,6 +46,11 @@ export class Histogram<
 	 * @param value The value to observe
 	 */
 	observe(value: number): void;
+	/**
+	 * Observe a value for given labels
+	 * @param labels Object with label keys and their values
+	 * @param value The value to observe
+	 */
 	observe(labels: LabelObject<L>, value: number): void;
 	observe(param1: LabelObject<L> | number, param2?: number) {
 		const [value, labels] = parseMetricParams(param1, param2, 0);
@@ -96,7 +101,6 @@ export class Histogram<
 		return startTimer(this.observe, startLabels);
 	}
 
-	// TODO: @overload tag
 	/**
 	 * Observes how long a function takes to execute. It can be used in two ways:
 	 * @example
@@ -113,7 +117,7 @@ export class Histogram<
 	reset() {
 		this.valueMap.clear();
 		if (!this.labelNames.length) {
-			this.valueMap.set(hashLabels({}), createValueEntry(this.#buckets, {})); // TODO: is this correct behavior?
+			this.valueMap.set(hashLabels({}), createValueEntry(this.#buckets, {}));
 		}
 	}
 }

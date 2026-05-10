@@ -18,6 +18,9 @@ export class Registry {
 		this.contentType = contentType;
 	}
 
+	/**
+	 * Register a metric or list of metrics
+	 */
 	register(...metrics: Metric[]) {
 		for (const metric of metrics) {
 			if (this.#metrics.has(metric.name)) {
@@ -27,16 +30,25 @@ export class Registry {
 		}
 	}
 
+	/**
+	 * Reset values of all registered metrics
+	 */
 	resetMetrics() {
 		for (const metric of this.#metrics.values()) {
 			metric.reset();
 		}
 	}
 
+	/**
+	 * Clear the list of registered metrics
+	 */
 	clear() {
 		this.#metrics.clear();
 	}
 
+	/**
+	 * Collect the registered metrics and format as a string
+	 */
 	async getMetrics() {
 		if (this.contentType === "OpenMetrics") {
 			throw new Error("OpenMetrics Registry content type is not yet supported");

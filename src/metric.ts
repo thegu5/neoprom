@@ -2,16 +2,32 @@ import { globalRegistry, type Registry } from "./registry.ts";
 import { getSymbol } from "./symbols.ts";
 
 export interface MetricConfiguration<T extends Metric<T, L>, L extends string> {
+	/**
+	 * The metric's name
+	 */
 	name: string;
+	/**
+	 * The metric's help string
+	 */
 	help: string;
+	/**
+	 * A list of labels. Also see the [prometheus docs](https://prometheus.io/docs/practices/instrumentation/#use-labels)
+	 */
 	labelNames?: readonly L[];
+	/**
+	 * A function that's ran when the metric is collected. Use for point-in-time observations
+	 * @param this The current metric
+	 */
 	collect?: (this: T) => void | Promise<void>;
+	/**
+	 * An array of registries to register the metric to. Defaults to the global registry
+	 */
 	registries?: Registry[];
 }
 
 export abstract class Metric<
 	// biome-ignore lint/suspicious/noExplicitAny: TODO: figure out a better way to deal with weird self-referential types
-	T extends Metric<T, L> = any,
+	T extends Metric<T, L, V> = any,
 	L extends string = string,
 	V extends object = object,
 > {
@@ -35,15 +51,24 @@ export abstract class Metric<
 		for (const registry of registries) {
 			registry.register(this);
 		}
+
+		// initialize value(s) with 0 if necessary
+		this.reset();
 	}
 
 	getValues() {
 		return this.valueMap.values();
 	}
 
+	/**
+	 * Call the metric's assocated `collect` function, if it exists.
+	 */
 	collect() {
 		return this.#collect?.call(this as unknown as T);
 	}
 
+	/**
+	 * Reset the metric's values
+	 */
 	abstract reset(): void;
 }

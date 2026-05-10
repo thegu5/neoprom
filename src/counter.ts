@@ -7,10 +7,15 @@ export class Counter<L extends string = string> extends Metric<
 	{ value: number; labels: LabelObject<L> }
 > {
 	/**
-	 * Increment counter
-	 * @param value The value to increment with
+	 * Increment counter for labels
+	 * @param labels An object containing label names and their values
+	 * @param value The amount to increment with
 	 */
 	inc(labels: LabelObject<L>, value?: number): void;
+	/**
+	 * Increment counter
+	 * @param value The value to increment with (default: 1)
+	 */
 	inc(value?: number): void;
 	inc(param1?: LabelObject<L> | number, param2?: number) {
 		const [value, labels] = parseMetricParams(param1, param2, 1);
@@ -47,7 +52,7 @@ export class Counter<L extends string = string> extends Metric<
 	reset() {
 		this.valueMap.clear();
 		if (!this.labelNames.length) {
-			this.valueMap.set(hashLabels({}), { labels: {}, value: 0 }); // TODO: is this correct behavior?
+			this.valueMap.set(hashLabels({}), { labels: {}, value: 0 });
 		}
 	}
 }

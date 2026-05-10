@@ -13,10 +13,15 @@ export class Gauge<L extends string = string> extends Metric<
 	{ value: number; labels: LabelObject<L> }
 > {
 	/**
-	 * Increment gauge
+	 * Increment gauge for given labels
+	 * @param labels Object with label keys and their values
 	 * @param value The value to increment with
 	 */
 	inc(labels: LabelObject<L>, value?: number): void;
+	/**
+	 * Increment gauge
+	 * @param value The value to increment with
+	 */
 	inc(value?: number): void;
 	inc(param1?: LabelObject<L> | number, param2?: number) {
 		const [value, labels] = parseMetricParams(param1, param2, 1);
@@ -32,10 +37,15 @@ export class Gauge<L extends string = string> extends Metric<
 	}
 
 	/**
-	 * Decrement gauge
+	 * Decrement gauge for given labels
+	 * @param labels Object with label keys and their values
 	 * @param value The value to decrement with
 	 */
 	dec(labels: LabelObject<L>, value?: number): void;
+	/**
+	 * Decrement gauge
+	 * @param value The value to decrement with
+	 */
 	dec(value?: number): void;
 	dec(param1?: LabelObject<L> | number, param2?: number) {
 		const [value, labels] = parseMetricParams(param1, param2, 1);
@@ -44,10 +54,15 @@ export class Gauge<L extends string = string> extends Metric<
 	}
 
 	/**
-	 * Set gauge
-	 * @param value The value to increment with
+	 * Set gauge for given labels
+	 * @param labels Object with label keys and their values
+	 * @param value The value to set
 	 */
 	set(labels: LabelObject<L>, value?: number): void;
+	/**
+	 * Set gauge
+	 * @param value The value to set
+	 */
 	set(value?: number): void;
 	set(param1?: LabelObject<L> | number, param2?: number) {
 		const [value, labels] = parseMetricParams(param1, param2, 1);
@@ -62,28 +77,25 @@ export class Gauge<L extends string = string> extends Metric<
 		}
 	}
 
-	setToCurrentTime(): void;
-	setToCurrentTime(labels: LabelObject<L>): void;
-	setToCurrentTime(labels?: LabelObject<L>) {
-		const now = Date.now() / 1000;
-		if (labels) {
-			this.set(labels, now);
-		} else {
-			this.set(now);
-		}
+	/**
+	 * Set gauge value to current epoch time in seconds
+	 * @param labels Object with label keys and values
+	 */
+	setToCurrentTime(labels: LabelObject<L> = {}) {
+		this.set(labels, Date.now() / 1000);
 	}
 
 	/**
-	 * Start timer to log a duration
+	 * Start timer to log a duration in seconds
 	 * @param startLabels Labels to record the time to
 	 */
 	startTimer(startLabels: LabelObject<L> = {}) {
 		return startTimer(this.set, startLabels);
 	}
 
-	// TODO: @overload tag
 	/**
-	 * Sets the gauge to how long a function takes to execute. It can be used in two ways:
+	 * Sets the gauge to how long a function takes to execute, in seconds.
+	 * Can be used as a function wrapper, or as a class method decorator.
 	 * @example
 	 * ```typescript
 	 * let result = gauge.time(doComputation, labels)(...args);
@@ -96,7 +108,8 @@ export class Gauge<L extends string = string> extends Metric<
 	time = createHook(this.startTimer);
 
 	/**
-	 * Increment the gauge when a function or class method is entered, and decrement it when exited.
+	 * Increment the gauge when a code block is entered, and decrement it when exited.
+	 * Can be used as a function wrapper, or as a class method decorator.
 	 * @example
 	 * ```typescript
 	 * let result = gauge.trackInProgress(someDatabaseCall, labels)(...args);
@@ -140,7 +153,7 @@ export class Gauge<L extends string = string> extends Metric<
 	reset() {
 		this.valueMap.clear();
 		if (!this.labelNames.length) {
-			this.valueMap.set(hashLabels({}), { labels: {}, value: 0 }); // TODO: is this correct behavior?
+			this.valueMap.set(hashLabels({}), { labels: {}, value: 0 });
 		}
 	}
 }
