@@ -82,11 +82,16 @@ export class Registry {
 						([a], [b]) => parseInt(a, 10) - parseInt(b, 10),
 					)) {
 						result += getMetricLine(
-							metric.name,
+							`${metric.name}_bucket`,
 							count,
 							Object.assign({ le: bucket }, val.labels),
 						);
 					}
+					result += getMetricLine(
+						`${metric.name}_bucket`,
+						val.count,
+						Object.assign({ le: "+Inf" }, val.labels),
+					);
 					result += getMetricLine(`${metric.name}_sum`, val.sum, val.labels);
 					result += getMetricLine(
 						`${metric.name}_count`,
