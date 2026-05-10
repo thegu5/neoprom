@@ -111,7 +111,7 @@ export class Registry {
 	}
 }
 
-function getMetricLine(name: string, value: unknown, labels: LabelObject) {
+function getMetricLine(name: string, value: number | string, labels: LabelObject) {
 	const altFormat = requiresEscaping(name);
 	const bracketEntries = getLabelPairs(labels);
 	if (altFormat) bracketEntries.unshift(escapeIdentifier(name));
@@ -120,7 +120,8 @@ function getMetricLine(name: string, value: unknown, labels: LabelObject) {
 	if (bracketEntries.length) {
 		result += `{${bracketEntries.join(",")}}`;
 	}
-	result += ` ${value}\n`;
+	// normalize infinity - both should parse correctly, but all other libraries do this
+	result += ` ${value.toString().replace("Infinity", "Inf")}\n`;
 	return result;
 }
 
