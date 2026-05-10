@@ -66,9 +66,11 @@ export function createHook<L extends string>(
 				const endHook = startHook(labels);
 				try {
 					const result = func.call(this, ...args);
+					endHook();
 					return result;
-				} finally {
+				} catch (error) {
 					if (options?.includeExceptions) endHook();
+					throw error;
 				}
 			};
 		}
@@ -84,9 +86,11 @@ export function createHook<L extends string>(
 				} as LabelObject<L>);
 				try {
 					const result = target.call(this, ...args);
+					endHook();
 					return result;
-				} finally {
+				} catch (error) {
 					if (options?.includeExceptions) endHook();
+					throw error;
 				}
 			};
 	}
