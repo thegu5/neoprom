@@ -90,7 +90,7 @@ export class Gauge<L extends string = string> extends Metric<
 	 * @param startLabels Labels to record the time to
 	 */
 	startTimer(startLabels: LabelObject<L> = {}) {
-		return startTimer(this.set, startLabels);
+		return startTimer(this.set.bind(this), startLabels);
 	}
 
 	/**
@@ -105,7 +105,7 @@ export class Gauge<L extends string = string> extends Metric<
 	 * }
 	 * ```
 	 */
-	time = createHook(this.startTimer);
+	time = createHook((labels) => this.startTimer(labels));
 
 	/**
 	 * Increment the gauge when a code block is entered, and decrement it when exited.

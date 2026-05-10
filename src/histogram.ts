@@ -98,7 +98,7 @@ export class Histogram<
 	 * @param startLabels Labels to record the time to
 	 */
 	startTimer(startLabels: LabelObject<L> = {}) {
-		return startTimer(this.observe, startLabels);
+		return startTimer(this.observe.bind(this), startLabels);
 	}
 
 	/**
@@ -112,7 +112,7 @@ export class Histogram<
 	 * }
 	 * ```
 	 */
-	time = createHook(this.startTimer);
+	time = createHook((labels) => this.startTimer(labels));
 
 	reset() {
 		this.valueMap.clear();
