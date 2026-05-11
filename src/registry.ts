@@ -64,10 +64,6 @@ export class Registry {
 	 * Collect the registered metrics and format as a string
 	 */
 	async getMetrics() {
-		if (this.#contentType === "OpenMetrics") {
-			throw new Error("OpenMetrics Registry content type is not yet supported");
-		}
-
 		await Promise.all(
 			Array.from(this.#metrics.values(), (metric) => metric.collect()),
 		);
@@ -133,7 +129,9 @@ export class Registry {
 				// );
 			}
 		}
-
+		if (this.#contentType === "OpenMetrics") {
+			result += "# EOF\n";
+		}
 		return result;
 	}
 }
