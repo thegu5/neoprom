@@ -10,12 +10,26 @@ export const RegistryContentType = {
 	OpenMetrics: "application/openmetrics-text; version=1.0.0; charset=utf-8",
 } as const;
 
+interface RegistryOptions {
+	/**
+	 * The content type of the registry's output. Defaults to `Prometheus`
+	 */
+	contentType?: keyof typeof RegistryContentType;
+	/**
+	 * Default labels to apply to every metric
+	 */
+	defaultLabels?: Record<string, string>;
+}
+
 export class Registry {
-	readonly contentType: keyof typeof RegistryContentType;
+	readonly #contentType: keyof typeof RegistryContentType;
+	readonly #defaultLabels: Record<string, string>;
+
 	#metrics = new Map<string, Metric>();
 
-	constructor(contentType: keyof typeof RegistryContentType = "Prometheus") {
-		this.contentType = contentType;
+	constructor(options?: RegistryOptions) {
+		this.#contentType = options?.contentType ?? "Prometheus";
+		this.#defaultLabels = options?.defaultLabels ?? {};
 	}
 
 	/**
@@ -50,7 +64,7 @@ export class Registry {
 	 * Collect the registered metrics and format as a string
 	 */
 	async getMetrics() {
-		if (this.contentType === "OpenMetrics") {
+		if (this.#contentType === "OpenMetrics") {
 			throw new Error("OpenMetrics Registry content type is not yet supported");
 		}
 
@@ -78,6 +92,8 @@ export class Registry {
 				}
 			} else if (metric.type === getSymbol("Histogram")) {
 				for (const val of (metric as Histogram).getValues()) {
+					const labels = Object.assign({}, this.#defaultLabels, val.labels);
+
 					let agg = 0;
 					for (const [bucket, count] of Object.entries(val.bucketValues).sort(
 						([a], [b]) => parseInt(a, 10) - parseInt(b, 10),
@@ -86,20 +102,18 @@ export class Registry {
 						result += getMetricLine(
 							`${metric.name}_bucket`,
 							agg,
-							Object.assign({ le: bucket }, val.labels),
+							Object.assign({ le: bucket }, labels),
 						);
 					}
+
 					result += getMetricLine(
 						`${metric.name}_bucket`,
 						val.count,
-						Object.assign({ le: "+Inf" }, val.labels),
+						Object.assign({ le: "+Inf" }, labels),
 					);
-					result += getMetricLine(`${metric.name}_sum`, val.sum, val.labels);
-					result += getMetricLine(
-						`${metric.name}_count`,
-						val.count,
-						val.labels,
-					);
+
+					result += getMetricLine(`${metric.name}_sum`, val.sum, labels);
+					result += getMetricLine(`${metric.name}_count`, val.count, labels);
 				}
 			} else {
 				// (currently) unreachable
