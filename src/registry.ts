@@ -78,12 +78,14 @@ export class Registry {
 				}
 			} else if (metric.type === getSymbol("Histogram")) {
 				for (const val of (metric as Histogram).getValues()) {
+					let agg = 0;
 					for (const [bucket, count] of Object.entries(val.bucketValues).sort(
 						([a], [b]) => parseInt(a, 10) - parseInt(b, 10),
 					)) {
+						agg += count;
 						result += getMetricLine(
 							`${metric.name}_bucket`,
-							count,
+							agg,
 							Object.assign({ le: bucket }, val.labels),
 						);
 					}
