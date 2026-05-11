@@ -83,12 +83,23 @@ export class Registry {
 			result += `# HELP ${escapeIfRequired(metric.name)} ${metric.help.replaceAll("\\", "\\\\").replaceAll("\n", "\\n")}\n`;
 			result += `# TYPE ${escapeIfRequired(metric.name)} ${metric.constructor.name.toLowerCase()}\n`;
 
-			if (
-				metric.type === getSymbol("Counter") ||
-				metric.type === getSymbol("Gauge")
-			) {
-				for (const val of (metric as Counter | Gauge).getValues()) {
-					result += getMetricLine(metric.name, val.value, val.labels);
+			if (metric.type === getSymbol("Counter")) {
+				for (const val of (metric as Counter).getValues()) {
+					const labels = Object.assign({}, this.#defaultLabels, val.labels);
+
+					// normalize name so it's the same between the prometheus text format and openmetrics
+					let name = metric.name;
+					if (!name.endsWith("_total")) {
+						name += "_total";
+					}
+
+					result += getMetricLine(name, val.value, labels);
+				}
+			} else if (metric.type === getSymbol("Gauge")) {
+				for (const val of (metric as Gauge).getValues()) {
+					const labels = Object.assign({}, this.#defaultLabels, val.labels);
+
+					result += getMetricLine(metric.name, val.value, labels);
 				}
 			} else if (metric.type === getSymbol("Histogram")) {
 				for (const val of (metric as Histogram).getValues()) {
