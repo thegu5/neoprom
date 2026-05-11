@@ -6,10 +6,10 @@ neoprom is a modern TypeScript-first client library for [Prometheus](https://pro
 ## Comparison
 |                          | prom-client | @gu5/neoprom |
 | ------------------------ | :---------: | :----------: |
-| Tested                   |      ✅      |    ❌ (0%)    |
+| Fully tested             |      ✅      |      ❌       |
 | TypeScript-first[^1]     |      ❌      |      ✅       |
 | Decorators/Wrappers[^2]  |      ❌      |      ✅       |
-| Standard runtime metrics |      ✅      |      ❌       |
+| Standard runtime metrics |      ✅      |      ⏳       |
 | Worker/Cluster Support   |      ✅      |      ❌       |
 | **Metric Types**         |
 | Counter                  |      ✅      |      ✅       |
