@@ -1,4 +1,4 @@
-import { Metric } from "./metric.ts";
+import { Metric, type MetricConfiguration } from "./metric.ts";
 import { hashLabels, type LabelObject, parseMetricParams } from "./utils.ts";
 
 export class Counter<L extends string = string> extends Metric<
@@ -6,6 +6,13 @@ export class Counter<L extends string = string> extends Metric<
 	L,
 	{ value: number; labels: LabelObject<L> }
 > {
+	constructor(options: MetricConfiguration<Counter<L>, L>) {
+		// normalize name so it's the same between the prometheus text format and openmetrics
+		if (!options.name.endsWith("_total")) {
+			options.name += "_total";
+		}
+		super(options);
+	}
 	/**
 	 * Increment counter for labels
 	 * @param labels An object containing label names and their values

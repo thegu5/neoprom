@@ -78,7 +78,7 @@ export class Registry {
 			// TODO: how are metric names in comments escaped?
 			result += `# HELP ${escapeIfRequired(metric.name)} ${metric.help.replaceAll("\\", "\\\\").replaceAll("\n", "\\n")}\n`;
 			if (this.#contentType === "OpenMetrics" && metric.unit) {
-				result += `# UNIT ${escapeIfRequired(metric.name)} ${metric.unit}`
+				result += `# UNIT ${escapeIfRequired(metric.name)} ${metric.unit}`;
 			}
 			result += `# TYPE ${escapeIfRequired(metric.name)} ${metric.constructor.name.toLowerCase()}\n`;
 
@@ -86,13 +86,7 @@ export class Registry {
 				for (const val of (metric as Counter).getValues()) {
 					const labels = Object.assign({}, this.#defaultLabels, val.labels);
 
-					// normalize name so it's the same between the prometheus text format and openmetrics
-					let name = metric.name;
-					if (!name.endsWith("_total")) {
-						name += "_total";
-					}
-
-					result += getMetricLine(name, val.value, labels);
+					result += getMetricLine(metric.name, val.value, labels);
 				}
 			} else if (metric.type === getSymbol("Gauge")) {
 				for (const val of (metric as Gauge).getValues()) {
