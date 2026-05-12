@@ -10,6 +10,20 @@ export interface MetricConfiguration<T extends Metric<T, L>, L extends string> {
 	 * The metric's help string
 	 */
 	help: string;
+
+	/**
+	 * Optional metric name prefix, first part
+	 */
+	namespace?: string;
+	/**
+	 * Optional metric name prefix, second part
+	 */
+	subsystem?: string;
+	/**
+	 * Optional unit suffix appended to the metric name
+	 */
+	unit?: string;
+
 	/**
 	 * A list of labels. Also see the [prometheus docs](https://prometheus.io/docs/practices/instrumentation/#use-labels)
 	 */
@@ -33,6 +47,8 @@ export abstract class Metric<
 > {
 	readonly name: string;
 	readonly help: string;
+	readonly unit: string | undefined;
+
 	readonly labelNames: readonly string[];
 	readonly #collect: MetricConfiguration<T, L>["collect"];
 	readonly type: symbol;
@@ -40,7 +56,16 @@ export abstract class Metric<
 	protected valueMap = new Map<string, V>();
 
 	constructor(config: MetricConfiguration<T, L>) {
-		this.name = config.name;
+		let name = "";
+		if (config.subsystem) name += `${config.subsystem}_`;
+		if (config.namespace) name += `${config.namespace}_`;
+		name += config.name;
+		if (config.unit) {
+			name += `_${config.unit}`;
+			this.unit = config.unit;
+		}
+
+		this.name = name;
 		this.help = config.help;
 		this.labelNames = config.labelNames ?? [];
 		this.#collect = config.collect;

@@ -77,6 +77,9 @@ export class Registry {
 
 			// TODO: how are metric names in comments escaped?
 			result += `# HELP ${escapeIfRequired(metric.name)} ${metric.help.replaceAll("\\", "\\\\").replaceAll("\n", "\\n")}\n`;
+			if (this.#contentType === "OpenMetrics" && metric.unit) {
+				result += `# UNIT ${escapeIfRequired(metric.name)} ${metric.unit}`
+			}
 			result += `# TYPE ${escapeIfRequired(metric.name)} ${metric.constructor.name.toLowerCase()}\n`;
 
 			if (metric.type === getSymbol("Counter")) {
