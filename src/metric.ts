@@ -60,9 +60,10 @@ export abstract class Metric<
 		if (config.subsystem) name += `${config.subsystem}_`;
 		if (config.namespace) name += `${config.namespace}_`;
 		name += config.name;
-		if (config.unit) {
+
+		this.unit = config.unit;
+		if (config.unit && !name.endsWith(`_${config.unit}`)) {
 			name += `_${config.unit}`;
-			this.unit = config.unit;
 		}
 
 		this.name = name;
