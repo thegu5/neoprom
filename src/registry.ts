@@ -1,6 +1,7 @@
 import type { Counter } from "./counter.ts";
 import type { Gauge } from "./gauge.ts";
 import type { Histogram } from "./histogram.ts";
+import type { Info } from "./info.ts";
 import type { Metric } from "./metric.ts";
 import { getSymbol } from "./symbols.ts";
 import type { LabelObject } from "./utils.ts";
@@ -118,6 +119,17 @@ export class Registry {
 
 					result += getMetricLine(`${metric.name}_sum`, val.sum, labels);
 					result += getMetricLine(`${metric.name}_count`, val.count, labels);
+				}
+			} else if (metric.type === getSymbol("Info")) {
+				if (this.#contentType !== "OpenMetrics") {
+					// todo: decide whether to 'convert' to gauge in the prometheus text format
+					throw new Error(
+						"Info metric is only supported for the OpenMetrics output format",
+					);
+				}
+				for (const val of (metric as Info).getValues()) {
+					const labels = Object.assign({}, this.#defaultLabels, val.labels);
+					result += getMetricLine(metric.name, 1, labels);
 				}
 			} else {
 				// (currently) unreachable
