@@ -11,6 +11,7 @@
  * @param count The number of items in array
  * @returns An array with the requested number of elements
  */
+// @__NO_SIDE_EFFECTS__
 export function linearBuckets(start: number, width: number, count: number) {
 	// assert(count >= 1, "Linear buckets needs a positive count");
 	if (count < 1) {
@@ -27,6 +28,7 @@ export function linearBuckets(start: number, width: number, count: number) {
  * @param count The number of items in array
  * @returns An array with the requested number of elements
  */
+// @__NO_SIDE_EFFECTS__
 export function exponentialBuckets(
 	start: number,
 	factor: number,
