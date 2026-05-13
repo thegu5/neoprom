@@ -11,16 +11,16 @@ neoprom is a modern TypeScript-first client library for [Prometheus](https://pro
 | Decorators/Wrappers[^2]  |      ❌      |      ✅       |
 | Standard runtime metrics |      ✅      |      ⏳       |
 | Worker/Cluster Support   |      ✅      |      ❌       |
+| Push Gateway             |      ✅      |      ❌       |
+| Exemplars                |      ✅      |      ❌       |
 | **Metric Types**         |
 | Counter                  |      ✅      |      ✅       |
 | Gauge                    |      ✅      |      ✅       |
 | Histogram                |      ✅      |      ✅       |
 | Summary                  |      ✅      |      ❌       |
-| Info                     |      ❔      |      ❌       |
-| **Output**               |
-| Prometheus               |      ✅      |      ✅       |
-| OpenMetrics              |      ✅      |      ❌       |
-| Push Gateway             |      ✅      |      ❌       |
+| Info                     |      ❌      |      ✅       |
+| StateSet                 |      ❌      |      ❌       |
+| GaugeHistogram           |      ❌      |      ❌       |
 
 [^1]: The entire library is written in TypeScript. Effort has been put in to make the types as accurate and strict as possible.
 [^2]: This refers to the `time` and `trackInProgress` methods. They can be used both to wrap functions, as well as ES7 class method decorators. See their docs for more.
