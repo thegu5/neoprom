@@ -11,6 +11,18 @@ describe("counter", () => {
 		instance = new Counter({ name: "counter_test", help: "test" });
 	});
 
+	it("should normalize counter metric names with _total suffix", () => {
+		assert.equal(instance.name, "counter_test_total");
+	});
+
+	it("should keep names that already end with _total", () => {
+		const preSuffixed = new Counter({
+			name: "requests_total",
+			help: "test",
+		});
+		assert.equal(preSuffixed.name, "requests_total");
+	});
+
 	it("should have a default value", () => {
 		assert.equal(Array.from(instance.getValues())[0].value, 0);
 	});
