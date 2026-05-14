@@ -1,11 +1,11 @@
-import { Metric, type MetricConfiguration } from "./metric.ts";
 import {
 	createHook,
 	hashLabels,
 	type LabelObject,
 	parseMetricParams,
 	startTimer,
-} from "./utils.ts";
+} from "../utils.ts";
+import { Metric, type MetricConfiguration } from "./metric.ts";
 
 export interface HistogramConfiguration<L extends string, B extends number>
 	extends MetricConfiguration<Histogram<L, B>, L> {

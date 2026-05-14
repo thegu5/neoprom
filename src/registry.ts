@@ -1,9 +1,9 @@
-import type { Counter } from "./counter.ts";
-import type { Gauge } from "./gauge.ts";
-import type { Histogram } from "./histogram.ts";
-import type { Info } from "./info.ts";
-import type { Metric } from "./metric.ts";
-import type { StateSet } from "./stateSet.ts";
+import type { Counter } from "./metrics/counter.ts";
+import type { Gauge } from "./metrics/gauge.ts";
+import type { Histogram } from "./metrics/histogram.ts";
+import type { Info } from "./metrics/info.ts";
+import type { Metric } from "./metrics/metric.ts";
+import type { StateSet } from "./metrics/stateSet.ts";
 import { getSymbol } from "./symbols.ts";
 import type { LabelObject } from "./utils.ts";
 

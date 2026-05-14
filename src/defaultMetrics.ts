@@ -1,7 +1,7 @@
 import { readdir, readFile } from "node:fs/promises";
-import { Counter } from "./counter.ts";
-import { Gauge } from "./gauge.ts";
-import type { Metric } from "./metric.ts";
+import { Counter } from "./metrics/counter.ts";
+import { Gauge } from "./metrics/gauge.ts";
+import type { Metric } from "./metrics/metric.ts";
 
 /**
  * Client-agnostic metrics covering details about the current process

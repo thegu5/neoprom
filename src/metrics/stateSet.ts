@@ -1,5 +1,5 @@
+import { hashLabels, isIn, type LabelObject } from "../utils.ts";
 import { Metric, type MetricConfiguration } from "./metric.ts";
-import { hashLabels, isIn, type LabelObject } from "./utils.ts";
 
 export interface StateSetConfiguration<L extends string, S extends string>
 	extends MetricConfiguration<StateSet<L, S>, L> {

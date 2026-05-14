@@ -1,5 +1,5 @@
-import { globalRegistry, type Registry } from "./registry.ts";
-import { getSymbol } from "./symbols.ts";
+import { globalRegistry, type Registry } from "../registry.ts";
+import { getSymbol } from "../symbols.ts";
 
 export interface MetricConfiguration<T extends Metric<T, L>, L extends string> {
 	/**

@@ -1,6 +1,6 @@
 import * as assert from "node:assert/strict";
 import { beforeEach, describe, it } from "node:test";
-import { Gauge } from "../src/gauge.ts";
+import { Gauge } from "../src/metrics/gauge.ts";
 import { globalRegistry } from "../src/registry.ts";
 
 let instance: Gauge;

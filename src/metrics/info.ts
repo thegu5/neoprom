@@ -1,5 +1,5 @@
+import { hashLabels, type LabelObject } from "../utils.ts";
 import { Metric, type MetricConfiguration } from "./metric.ts";
-import { hashLabels, type LabelObject } from "./utils.ts";
 
 export class Info<L extends string = string> extends Metric<
 	Info<L>,

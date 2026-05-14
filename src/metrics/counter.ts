@@ -1,5 +1,5 @@
+import { hashLabels, type LabelObject, parseMetricParams } from "../utils.ts";
 import { Metric, type MetricConfiguration } from "./metric.ts";
-import { hashLabels, type LabelObject, parseMetricParams } from "./utils.ts";
 
 export class Counter<L extends string = string> extends Metric<
 	Counter<L>,

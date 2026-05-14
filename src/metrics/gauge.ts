@@ -1,11 +1,11 @@
-import { Metric } from "./metric.ts";
 import {
 	createHook,
 	hashLabels,
 	type LabelObject,
 	parseMetricParams,
 	startTimer,
-} from "./utils.ts";
+} from "../utils.ts";
+import { Metric } from "./metric.ts";
 
 export class Gauge<L extends string = string> extends Metric<
 	Gauge<L>,

@@ -1,6 +1,6 @@
 import * as assert from "node:assert/strict";
 import { beforeEach, describe, it } from "node:test";
-import { Counter } from "../src/counter.ts";
+import { Counter } from "../src/metrics/counter.ts";
 import { globalRegistry } from "../src/registry.ts";
 
 let instance: Counter;

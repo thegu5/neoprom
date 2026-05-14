@@ -1,6 +1,6 @@
 import * as assert from "node:assert/strict";
 import { beforeEach, describe, it } from "node:test";
-import { Histogram } from "../src/histogram.ts";
+import { Histogram } from "../src/metrics/histogram.ts";
 import { globalRegistry } from "../src/registry.ts";
 
 let instance: Histogram;
