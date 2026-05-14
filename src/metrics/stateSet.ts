@@ -58,7 +58,7 @@ export class StateSet<
 	}
 
 	/**
-	 * Get sub-counter for a given set of labels
+	 * Get sub-state for a given set of labels
 	 * @param labels Labels to affect when used
 	 */
 	withLabels(labels: LabelObject<L>) {
