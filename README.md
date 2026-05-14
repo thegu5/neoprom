@@ -19,7 +19,7 @@ neoprom is a modern TypeScript-first client library for [Prometheus](https://pro
 | Histogram                |      ✅      |      ✅       |
 | Summary                  |      ✅      |      ❌       |
 | Info                     |      ❌      |      ✅       |
-| StateSet                 |      ❌      |      ❌       |
+| StateSet                 |      ❌      |      ✅       |
 | GaugeHistogram           |      ❌      |      ❌       |
 
 [^1]: The entire library is written in TypeScript. Effort has been put in to make the types as accurate and strict as possible.
