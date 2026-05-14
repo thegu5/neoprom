@@ -141,6 +141,13 @@ export class Gauge<L extends string = string> extends Metric<
 			dec: (value?: number) => {
 				this.dec(labels, value);
 			},
+			set: (value?: number) => {
+				this.set(labels, value);
+			},
+			startTimer: () => {
+				return this.startTimer(labels);
+			},
+			time: createHook(() => this.startTimer(labels)),
 			reset: () => {
 				this.valueMap.delete(hashLabels(labels));
 			},
