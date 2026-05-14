@@ -62,7 +62,7 @@ export class Histogram<
 
 		let entry = this.valueMap.get(hashed);
 		if (!entry) {
-			entry = createValueEntry(this.#buckets, labels);
+			entry = this.#createValueEntry(labels);
 			this.valueMap.set(hashed, entry);
 		}
 
@@ -77,28 +77,17 @@ export class Histogram<
 
 		if (!bucket) return;
 
-		// idk if this is right
 		entry.bucketValues[bucket] += 1;
 	}
 
-	/**
-	 * Get sub-histogram for a given set of labels
-	 * @param labels Labels to affect when used
-	 */
-	withLabels(labels: LabelObject<L>) {
-		return {
-			observe: (value: number) => {
-				this.observe(labels, value);
-			},
-			reset: () => {
-				this.valueMap.delete(hashLabels(labels));
-			},
-		};
+	zero(labels: LabelObject<L>) {
+		this.valueMap.set(hashLabels(labels), this.#createValueEntry(labels));
 	}
 
 	/**
 	 * Start timer to log a duration
 	 * @param startLabels Labels to record the time to
+	 * @returns a function that ends the timer when called
 	 */
 	startTimer(startLabels: LabelObject<L> = {}) {
 		return startTimer(this.observe.bind(this), startLabels);
@@ -117,6 +106,26 @@ export class Histogram<
 	 */
 	time = createHook((labels) => this.startTimer(labels));
 
+	/**
+	 * Get sub-histogram for a given set of labels
+	 * @param labels Labels to affect when used
+	 */
+	withLabels(labels: LabelObject<L>) {
+		return {
+			observe: (value: number) => {
+				this.observe(labels, value);
+			},
+			zero: () => this.zero(labels),
+			startTimer: () => {
+				return this.startTimer(labels);
+			},
+			time: createHook(() => this.startTimer(labels)),
+			reset: () => {
+				this.valueMap.delete(hashLabels(labels));
+			},
+		};
+	}
+
 	reset() {
 		// skip when called from `Metric`'s constructor
 		try {
@@ -127,22 +136,20 @@ export class Histogram<
 
 		this.valueMap.clear();
 		if (!this.labelNames.length) {
-			this.valueMap.set(hashLabels({}), createValueEntry(this.#buckets, {}));
+			this.valueMap.set(hashLabels({}), this.#createValueEntry());
 		}
 	}
-}
 
-function createValueEntry<L extends string, B extends number>(
-	buckets: readonly B[],
-	labels: LabelObject<L>,
-) {
-	return {
-		sum: 0,
-		count: 0,
-		bucketValues: Object.fromEntries(buckets.map((v) => [v, 0])) as Record<
-			B,
-			number
-		>,
-		labels,
-	};
+	#createValueEntry<L extends string, B extends number>(
+		labels: LabelObject<L> = {},
+	) {
+		return {
+			sum: 0,
+			count: 0,
+			bucketValues: Object.fromEntries(
+				this.#buckets.map((v) => [v, 0]),
+			) as Record<B, number>,
+			labels,
+		};
+	}
 }
