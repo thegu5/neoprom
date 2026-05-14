@@ -97,3 +97,9 @@ export function createHook<L extends string>(
 
 	return wrapper;
 }
+
+// https://stackoverflow.com/a/74213179
+// biome-ignore lint/suspicious/noExplicitAny: intended
+export function isIn<T>(values: readonly T[], x: any): x is T {
+	return values.includes(x);
+}

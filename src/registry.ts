@@ -3,6 +3,7 @@ import type { Gauge } from "./gauge.ts";
 import type { Histogram } from "./histogram.ts";
 import type { Info } from "./info.ts";
 import type { Metric } from "./metric.ts";
+import type { StateSet } from "./stateSet.ts";
 import { getSymbol } from "./symbols.ts";
 import type { LabelObject } from "./utils.ts";
 
@@ -131,11 +132,27 @@ export class Registry {
 					const labels = Object.assign({}, this.#defaultLabels, val.labels);
 					result += getMetricLine(metric.name, 1, labels);
 				}
+			} else if (metric.type === getSymbol("StateSet")) {
+				if (this.#contentType !== "OpenMetrics") {
+					// todo: decide whether to 'convert' to gauge in the prometheus text format
+					throw new Error(
+						"StateSet metric is only supported for the OpenMetrics output format",
+					);
+				}
+				for (const val of (metric as StateSet).getValues()) {
+					const labels = Object.assign({}, this.#defaultLabels, val.labels);
+					for (const [stateName, stateValue] of Object.entries(val.states)) {
+						result += getMetricLine(
+							metric.name,
+							stateValue ? 1 : 0,
+							Object.assign({ [metric.name]: stateName }, labels),
+						);
+					}
+				}
 			} else {
-				// (currently) unreachable
-				// throw new Error(
-				// 	`${metric.constructor.name} metric type not fully implemented`,
-				// );
+				throw new Error(
+					`${metric.constructor.name} metric type not fully implemented`,
+				);
 			}
 		}
 		if (this.#contentType === "OpenMetrics") {
