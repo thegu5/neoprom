@@ -30,7 +30,8 @@ export class Registry {
 	#metrics = new Map<string, Metric>();
 
 	constructor(options?: RegistryOptions) {
-		this.contentType = RegistryContentType[options?.contentType ?? "Prometheus"];
+		this.contentType =
+			RegistryContentType[options?.contentType ?? "Prometheus"];
 		this.#defaultLabels = options?.defaultLabels ?? {};
 	}
 
