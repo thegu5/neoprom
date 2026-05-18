@@ -24,13 +24,13 @@ interface RegistryOptions {
 }
 
 export class Registry {
-	readonly #contentType: keyof typeof RegistryContentType;
+	readonly contentType: (typeof RegistryContentType)[keyof typeof RegistryContentType];
 	readonly #defaultLabels: Record<string, string>;
 
 	#metrics = new Map<string, Metric>();
 
 	constructor(options?: RegistryOptions) {
-		this.#contentType = options?.contentType ?? "Prometheus";
+		this.contentType = RegistryContentType[options?.contentType ?? "Prometheus"];
 		this.#defaultLabels = options?.defaultLabels ?? {};
 	}
 
@@ -79,7 +79,7 @@ export class Registry {
 
 			// TODO: how are metric names in comments escaped?
 			result += `# HELP ${escapeIfRequired(metric.name)} ${metric.help.replaceAll("\\", "\\\\").replaceAll("\n", "\\n")}\n`;
-			if (this.#contentType === "OpenMetrics" && metric.unit) {
+			if (this.contentType === RegistryContentType.OpenMetrics && metric.unit) {
 				result += `# UNIT ${escapeIfRequired(metric.name)} ${metric.unit}`;
 			}
 			result += `# TYPE ${escapeIfRequired(metric.name)} ${metric.constructor.name.toLowerCase()}\n`;
@@ -122,7 +122,7 @@ export class Registry {
 					result += getMetricLine(`${metric.name}_count`, val.count, labels);
 				}
 			} else if (metric.type === getSymbol("Info")) {
-				if (this.#contentType !== "OpenMetrics") {
+				if (this.contentType !== RegistryContentType.OpenMetrics) {
 					// todo: decide whether to 'convert' to gauge in the prometheus text format
 					throw new Error(
 						"Info metric is only supported for the OpenMetrics output format",
@@ -133,7 +133,7 @@ export class Registry {
 					result += getMetricLine(metric.name, 1, labels);
 				}
 			} else if (metric.type === getSymbol("StateSet")) {
-				if (this.#contentType !== "OpenMetrics") {
+				if (this.contentType !== RegistryContentType.OpenMetrics) {
 					// todo: decide whether to 'convert' to gauge in the prometheus text format
 					throw new Error(
 						"StateSet metric is only supported for the OpenMetrics output format",
@@ -155,7 +155,7 @@ export class Registry {
 				);
 			}
 		}
-		if (this.#contentType === "OpenMetrics") {
+		if (this.contentType === RegistryContentType.OpenMetrics) {
 			result += "# EOF\n";
 		}
 		return result;
