@@ -14,7 +14,7 @@ pkgs.testers.runNixOSTest {
       environment.systemPackages = [ pkgs.prometheus.cli ];
       systemd.services.metrics = {
         wantedBy = [ "multi-user.target" ];
-        serviceConfig.ExecStart = "${lib.getExe pkgs.nodejs-slim_latest} ${lib.cleanSource src}/test/integrated/metrics-server.ts";
+        serviceConfig.ExecStart = "${lib.getExe pkgs.nodejs-slim_latest} ${src}/test/integrated/metrics-server.ts";
       };
 
       services.prometheus = {

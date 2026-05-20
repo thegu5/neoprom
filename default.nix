@@ -1,10 +1,12 @@
 {
   pkgs ? import <nixpkgs> { },
 }:
+let
+  lib = pkgs.lib;
+in
 {
   prometheus-scrape = import ./test/integrated/prometheus-scrape.nix {
-    inherit pkgs;
-    inherit (pkgs) lib;
-    src = ./.;
+    inherit pkgs lib;
+    src = lib.cleanSource ./.;
   };
 }
