@@ -22,8 +22,9 @@
 		"README.md"
 	],
 	"scripts": {
+		"build": "tsdown",
 		"test": "node --test",
-		"build": "tsdown"
+		"test:integrated": "nix-build -A prometheus-scrape"
 	},
 	"packageManager": "pnpm@11.1.1",
 	"devDependencies": {
