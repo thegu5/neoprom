@@ -1,6 +1,6 @@
 {
 	"name": "@gu5/neoprom",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"description": "A modern TypeScript-first client library for Prometheus",
 	"author": "Gus",
 	"license": "MIT",

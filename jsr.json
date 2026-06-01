@@ -1,0 +1,8 @@
+{
+	"$schema": "https://jsr.io/schema/config-file.v1.json",
+	"name": "@gu5/neoprom",
+	"version": "0.1.0",
+	"exports": "./dist/index.js",
+	"license": "GPL-3.0-only",
+	"exclude": ["!dist", "test", "biome.jsonc", "tsdown.config.ts", "tsconfig.json"]
+}
