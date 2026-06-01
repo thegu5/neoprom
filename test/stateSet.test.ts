@@ -1,7 +1,6 @@
 import * as assert from "node:assert/strict";
 import { beforeEach, describe, it } from "node:test";
-import { StateSet } from "../src/metrics/stateSet.ts";
-import { globalRegistry } from "../src/registry.ts";
+import { globalRegistry, StateSet } from "../src/index.ts";
 
 let instance: StateSet;
 

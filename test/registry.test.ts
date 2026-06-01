@@ -1,7 +1,5 @@
 // import { beforeEach, describe, it } from "node:test";
-// import { Counter } from "../src/counter.ts";
-// import { Histogram } from "../src/histogram.ts";
-// import { globalRegistry } from "../src/registry.ts";
+// import { Counter, Histogram, globalRegistry } from "../src/index.ts";
 
 // // none of these are actual tests yet, need to do assertions
 // describe("Registry", () => {
