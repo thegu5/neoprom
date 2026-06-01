@@ -11,9 +11,15 @@ importers:
       '@biomejs/biome':
         specifier: 2.4.15
         version: 2.4.15
+      '@hono/node-server':
+        specifier: ^2.0.3
+        version: 2.0.3(hono@4.12.21)
       '@types/node':
         specifier: ^25.7.0
         version: 25.7.0
+      hono:
+        specifier: ^4.12.21
+        version: 4.12.21
       tsdown:
         specifier: ^0.22.0
         version: 0.22.0(typescript@6.0.3)
@@ -109,6 +115,12 @@ packages:
 
   '@emnapi/wasi-threads@1.2.1':
     resolution: {integrity: sha512-uTII7OYF+/Mes/MrcIOYp5yOtSMLBWSIoLPpcgwipoiKbli6k322tcoFsxoIIxPDqW01SQGAgko4EzZi2BNv2w==}
+
+  '@hono/node-server@2.0.3':
+    resolution: {integrity: sha512-a0jV+/HRe3G5zjFID3zObAQFdkl6zpxTuqktdDDXS3MJKcrZIkB8OkLpNBlY/WXFqv2HF4a0takPej+aNFczWA==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      hono: ^4
 
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
@@ -291,6 +303,10 @@ packages:
   get-tsconfig@5.0.0-beta.5:
     resolution: {integrity: sha512-/6gFNr0N04nob252sTQxyFLi3eKFRqIg1I87YcqAMT1i6SQrSF6KujUEQrtrjMV0H/eejTCltLdDSTEMzHbnsQ==}
     engines: {node: '>=20.20.0'}
+
+  hono@4.12.21:
+    resolution: {integrity: sha512-uV63apnb0kyPtAUwoWgaGh9HyIFcv8lgmzPZSiTBQAFOFGIzka5EZ1dZocmGnn0XdX0+XTqJ6Tqv7selMuGLRQ==}
+    engines: {node: '>=16.9.0'}
 
   hookable@6.1.1:
     resolution: {integrity: sha512-U9LYDy1CwhMCnprUfeAZWZGByVbhd54hwepegYTK7Pi5NvqEj63ifz5z+xukznehT7i6NIZRu89Ay1AZmRsLEQ==}
@@ -484,6 +500,10 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
+  '@hono/node-server@2.0.3(hono@4.12.21)':
+    dependencies:
+      hono: 4.12.21
+
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
@@ -604,6 +624,8 @@ snapshots:
   get-tsconfig@5.0.0-beta.5:
     dependencies:
       resolve-pkg-maps: 1.0.0
+
+  hono@4.12.21: {}
 
   hookable@6.1.1: {}
 

@@ -1,22 +1,32 @@
-import http from "node:http";
-import { Counter, Registry } from "../../src/index.ts";
+import { serve } from "@hono/node-server";
+import { Hono } from "hono";
+import { Gauge, globalRegistry, Histogram } from "../../src/index.ts";
 
-const registry = new Registry();
-const counter = new Counter({
-	name: "neoprom_test_total",
-	help: "test counter",
+new Gauge({
+	name: "collectors_ready",
+	help: "Number of active collectors",
+}).inc();
+
+const hist = new Histogram({
+	name: "bweh_hist",
+	help: ".",
 });
-registry.register(counter);
-counter.inc();
+hist.observe(-1);
+hist.observe(0);
+hist.observe(0.5);
+hist.observe(5);
 
-http
-	.createServer(async (req, res) => {
-		if (req.url === "/metrics") {
-			res.writeHead(200, { "content-type": registry.contentType });
-			res.end(await registry.getMetrics());
-			return;
-		}
-		res.writeHead(404);
-		res.end();
-	})
-	.listen(9000, "0.0.0.0");
+const app = new Hono();
+
+app.get("/metrics", async () => {
+	return new Response(await globalRegistry.getMetrics(), {
+		headers: {
+			"Content-Type": globalRegistry.contentType,
+		},
+	});
+});
+
+serve({
+	fetch: app.fetch,
+	port: 9000,
+});
