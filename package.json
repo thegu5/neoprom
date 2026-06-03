@@ -1,43 +1,43 @@
 {
-	"name": "@gu5/neoprom",
-	"version": "0.0.1",
-	"description": "A modern TypeScript-first client library for Prometheus",
-	"author": "Gus",
-	"license": "MIT",
-	"homepage": "https://github.com/thegu5/neoprom",
-	"bugs": {
-		"url": "https://github.com/thegu5/neoprom/issues"
-	},
-	"repository": "git+https://github.com/thegu5/neoprom.git",
-	"type": "module",
-	"sideEffects": false,
-	"exports": {
-		".": {
-			"import": {
-				"types": "./dist/index.d.ts",
-				"default": "./dist/index.js"
-			}
-		},
-		"./package.json": "./package.json"
-	},
-	"files": [
-		"dist",
-		"src",
-		"LICENSE",
-		"README.md"
-	],
-	"scripts": {
-		"build": "tsdown",
-		"test": "node --test",
-		"test:integrated": "nix-build ./test/integrated/prometheus-scrape.nix"
-	},
-	"packageManager": "pnpm@11.1.1",
-	"devDependencies": {
-		"@biomejs/biome": "2.4.15",
-		"@hono/node-server": "^2.0.3",
-		"@types/node": "^25.7.0",
-		"hono": "^4.12.21",
-		"tsdown": "^0.22.0",
-		"typescript": "^6.0.3"
-	}
+  "name": "@gu5/neoprom",
+  "version": "0.1.0",
+  "description": "A modern TypeScript-first client library for Prometheus",
+  "author": "Gus",
+  "license": "MIT",
+  "homepage": "https://github.com/thegu5/neoprom",
+  "bugs": {
+    "url": "https://github.com/thegu5/neoprom/issues"
+  },
+  "repository": "git+https://github.com/thegu5/neoprom.git",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "test": "node --test",
+    "test:integrated": "nix-build ./test/integrated/prometheus-scrape.nix"
+  },
+  "packageManager": "pnpm@11.1.1",
+  "devDependencies": {
+    "@biomejs/biome": "2.4.15",
+    "@hono/node-server": "^2.0.3",
+    "@types/node": "^25.7.0",
+    "hono": "^4.12.21",
+    "tsdown": "^0.22.0",
+    "typescript": "^6.0.3"
+  }
 }
