@@ -48,6 +48,15 @@ export class Registry {
 	}
 
 	/**
+	 * Unregister a metric or list of metrics
+	 */
+	unregister(...metrics: (Metric | string)[]) {
+		for (const metric of metrics) {
+			this.#metrics.delete(typeof metric === "string" ? metric : metric.name);
+		}
+	}
+
+	/**
 	 * Reset values of all registered metrics
 	 */
 	resetMetrics() {
