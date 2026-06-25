@@ -46,7 +46,14 @@ export const defaultMetrics: Metric[] = [
 		: null,
 	null, // TODO: process_virtual_memory_bytes
 	null, // TODO: process_virtual_memory_max_bytes
-	null, // TODO: process_resident_memory_bytes
+	new Gauge({
+		name: "process_resident_memory_bytes",
+		help: "Resident memory size in bytes.",
+		registries: [],
+		collect() {
+			this.set(process.memoryUsage.rss())
+		}
+	}),
 	null, // TODO: process_heap_bytes
 	new Counter({
 		name: "process_start_time_seconds",
