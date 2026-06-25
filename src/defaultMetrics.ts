@@ -51,8 +51,8 @@ export const defaultMetrics: Metric[] = [
 		help: "Resident memory size in bytes.",
 		registries: [],
 		collect() {
-			this.set(process.memoryUsage.rss())
-		}
+			this.set(process.memoryUsage.rss());
+		},
 	}),
 	null, // TODO: process_heap_bytes
 	new Counter({
