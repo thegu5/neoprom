@@ -28,6 +28,7 @@
 	],
 	"scripts": {
 		"build": "tsdown",
+		"prepack": "pnpm build",
 		"test": "node --test",
 		"test:integrated": "nix-build ./test/integrated/prometheus-scrape.nix"
 	},
