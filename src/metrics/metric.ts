@@ -82,6 +82,9 @@ export abstract class Metric<
 		this.reset();
 	}
 
+	/**
+	 * Only use this if you know what you're doing!
+	 */
 	getValues() {
 		return this.valueMap.values();
 	}

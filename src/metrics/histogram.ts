@@ -21,7 +21,7 @@ export class Histogram<
 	{
 		sum: number;
 		count: number;
-		bucketValues: Record<B, number>;
+		bucketValues: Map<B, number>;
 		labels: LabelObject<L>;
 	}
 > {
@@ -77,7 +77,7 @@ export class Histogram<
 
 		if (!bucket) return;
 
-		entry.bucketValues[bucket] += 1;
+		entry.bucketValues.set(bucket, (entry.bucketValues.get(bucket) ?? 0) + 1);
 	}
 
 	zero(labels: LabelObject<L>) {
@@ -140,15 +140,11 @@ export class Histogram<
 		}
 	}
 
-	#createValueEntry<L extends string, B extends number>(
-		labels: LabelObject<L> = {},
-	) {
+	#createValueEntry<L extends string>(labels: LabelObject<L> = {}) {
 		return {
 			sum: 0,
 			count: 0,
-			bucketValues: Object.fromEntries(
-				this.#buckets.map((v) => [v, 0]),
-			) as Record<B, number>,
+			bucketValues: new Map(this.#buckets.map((v) => [v, 0] as const)),
 			labels,
 		};
 	}

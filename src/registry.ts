@@ -111,8 +111,8 @@ export class Registry {
 					const labels = Object.assign({}, this.#defaultLabels, val.labels);
 
 					let agg = 0;
-					for (const [bucket, count] of Object.entries(val.bucketValues).sort(
-						([a], [b]) => Number.parseFloat(a) - Number.parseFloat(b, 10),
+					for (const [bucket, count] of Array.from(val.bucketValues).sort(
+						([a], [b]) => a - b,
 					)) {
 						agg += count;
 						result += getMetricLine(

@@ -16,7 +16,7 @@ describe("histogram", () => {
 		assert.equal(value.count, 0);
 		assert.deepEqual(value.labels, {});
 		assert.equal(
-			Object.values(value.bucketValues).every((count) => count === 0),
+			Array.from(value.bucketValues.values()).every((count) => count === 0),
 			true,
 		);
 	});
@@ -28,8 +28,8 @@ describe("histogram", () => {
 		const value = Array.from(instance.getValues())[0];
 		assert.equal(value.sum, 10.1);
 		assert.equal(value.count, 2);
-		assert.equal(value.bucketValues[0.1], 1);
-		assert.equal(value.bucketValues[10], 1);
+		assert.equal(value.bucketValues.get(0.1), 1);
+		assert.equal(value.bucketValues.get(10), 1);
 	});
 
 	it("should support labeled observations", () => {
@@ -48,37 +48,37 @@ describe("histogram", () => {
 				sum: 0.3,
 				count: 2,
 				labels: { method: "GET", status: "200" },
-				bucketValues: {
-					0.005: 0,
-					0.01: 0,
-					0.025: 0,
-					0.05: 1,
-					0.1: 0,
-					0.25: 1,
-					0.5: 0,
-					1: 0,
-					2.5: 0,
-					5: 0,
-					10: 0,
-				},
+				bucketValues: new Map([
+					[0.005, 0],
+					[0.01, 0],
+					[0.025, 0],
+					[0.05, 1],
+					[0.1, 0],
+					[0.25, 1],
+					[0.5, 0],
+					[1, 0],
+					[2.5, 0],
+					[5, 0],
+					[10, 0],
+				]),
 			},
 			{
 				sum: 5,
 				count: 1,
 				labels: { method: "POST", status: "500" },
-				bucketValues: {
-					0.005: 0,
-					0.01: 0,
-					0.025: 0,
-					0.05: 0,
-					0.1: 0,
-					0.25: 0,
-					0.5: 0,
-					1: 0,
-					2.5: 0,
-					5: 1,
-					10: 0,
-				},
+				bucketValues: new Map([
+					[0.005, 0],
+					[0.01, 0],
+					[0.025, 0],
+					[0.05, 0],
+					[0.1, 0],
+					[0.25, 0],
+					[0.5, 0],
+					[1, 0],
+					[2.5, 0],
+					[5, 1],
+					[10, 0],
+				]),
 			},
 		]);
 	});
@@ -104,19 +104,19 @@ describe("histogram", () => {
 				sum: 5,
 				count: 1,
 				labels: { method: "POST" },
-				bucketValues: {
-					0.005: 0,
-					0.01: 0,
-					0.025: 0,
-					0.05: 0,
-					0.1: 0,
-					0.25: 0,
-					0.5: 0,
-					1: 0,
-					2.5: 0,
-					5: 1,
-					10: 0,
-				},
+				bucketValues: new Map([
+					[0.005, 0],
+					[0.01, 0],
+					[0.025, 0],
+					[0.05, 0],
+					[0.1, 0],
+					[0.25, 0],
+					[0.5, 0],
+					[1, 0],
+					[2.5, 0],
+					[5, 1],
+					[10, 0],
+				]),
 			},
 		]);
 	});
@@ -130,7 +130,7 @@ describe("histogram", () => {
 		assert.equal(value.count, 0);
 		assert.deepEqual(value.labels, {});
 		assert.equal(
-			Object.values(value.bucketValues).every((count) => count === 0),
+			Array.from(value.bucketValues.values()).every((count) => count === 0),
 			true,
 		);
 	});
