@@ -112,7 +112,7 @@ export class Registry {
 
 					let agg = 0;
 					for (const [bucket, count] of Object.entries(val.bucketValues).sort(
-						([a], [b]) => parseInt(a, 10) - parseInt(b, 10),
+						([a], [b]) => Number.parseFloat(a) - Number.parseFloat(b, 10),
 					)) {
 						agg += count;
 						result += getMetricLine(
