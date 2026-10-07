@@ -27,18 +27,17 @@
 		"README.md"
 	],
 	"scripts": {
-		"build": "tsdown",
+		"build": "tsc -p tsconfig.build.json",
 		"prepack": "pnpm build",
-		"test": "node --test",
+		"test": "node --test **/*.test.ts",
 		"test:integrated": "nix-build ./test/integrated/prometheus-scrape.nix"
 	},
-	"packageManager": "pnpm@11.17.0",
+	"packageManager": "pnpm@12.10.1",
 	"devDependencies": {
 		"@biomejs/biome": "2.4.15",
-		"@hono/node-server": "^2.0.12",
-		"@types/node": "^26.1.2",
-		"hono": "^4.12.32",
-		"tsdown": "^0.22.14",
+		"@hono/node-server": "^2.1.3",
+		"@types/node": "^26.6.4",
+		"hono": "^4.13.13",
 		"typescript": "^7.0.2"
 	}
 }

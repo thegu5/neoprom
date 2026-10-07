@@ -2,10 +2,10 @@ name: release
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    types: [closed]
-    branches: [main]
+    types: [ closed ]
+    branches: [ main ]
   # this is required to trigger releases when the release PR is merged, or to rerun a release if needed
   workflow_dispatch:
 
@@ -19,10 +19,10 @@ jobs:
     if: github.event_name == 'push' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
     runs-on: ubuntu-latest
     permissions:
-      contents: write       # push the `release/vX.Y.Z` branch and delete superseded ones
-      pull-requests: write  # create a release PR, update its body, close superseded PRs
+      contents: write # push the `release/vX.Y.Z` branch and delete superseded ones
+      pull-requests: write # create a release PR, update its body, close superseded PRs
     steps:
-      - uses: danielroe/uppt/pr@7bcfb5397c37202ef882363f755423130419d28a # v0.5.5
+      - uses: danielroe/uppt/pr@6ec27140623aa835e362f866d8ab0018ab057f4d # v0.6.11
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -41,10 +41,10 @@ jobs:
       group: release-${{ github.event.pull_request.number }}
       cancel-in-progress: false
     permissions:
-      contents: write       # push the `vX.Y.Z` tag and create the GitHub release
-      actions: write        # `gh workflow run release.yml --ref vX.Y.Z` chained dispatch
+      contents: write # push the `vX.Y.Z` tag and create the GitHub release
+      actions: write # `gh workflow run release.yml --ref vX.Y.Z` chained dispatch
     steps:
-      - uses: danielroe/uppt/release@7bcfb5397c37202ef882363f755423130419d28a # v0.5.5
+      - uses: danielroe/uppt/release@6ec27140623aa835e362f866d8ab0018ab057f4d # v0.6.11
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -64,7 +64,7 @@ jobs:
       files: ${{ steps.pack.outputs.files }}
     steps:
       - id: pack
-        uses: danielroe/uppt/pack@7bcfb5397c37202ef882363f755423130419d28a # v0.5.5
+        uses: danielroe/uppt/pack@6ec27140623aa835e362f866d8ab0018ab057f4d # v0.6.11
 
   # `publish` downloads the prebuilt tarball from the pack job's
   # artifact and stages it for publish.
@@ -79,9 +79,9 @@ jobs:
       group: publish-${{ github.ref }}
       cancel-in-progress: false
     permissions:
-      id-token: write       # OIDC claim for npm trusted publisher
-    environment: npm        # must match the trusted-publisher entry on npmjs.com
+      id-token: write # OIDC claim for npm trusted publisher
+    environment: npm # must match the trusted-publisher entry on npmjs.com
     steps:
-      - uses: danielroe/uppt/publish@7bcfb5397c37202ef882363f755423130419d28a # v0.5.5
+      - uses: danielroe/uppt/publish@6ec27140623aa835e362f866d8ab0018ab057f4d # v0.6.11
         with:
           files: ${{ needs.pack.outputs.files }}
