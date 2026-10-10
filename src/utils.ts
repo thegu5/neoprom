@@ -1,6 +1,7 @@
 export function hashLabels(labels: Record<string, string | undefined>) {
 	return Object.entries(labels)
 		.filter(([_name, value]) => value)
+		.sort(([nameA], [nameB]) => (nameA < nameB ? -1 : nameA > nameB ? 1 : 0))
 		.map(([name, value]) => `${name}:${value}`)
 		.join(",");
 }
