@@ -18,6 +18,12 @@
 				"default": "./dist/index.js"
 			}
 		},
+		"./hono": {
+			"import": {
+				"types": "./dist/middleware/hono.d.ts",
+				"default": "./dist/middleware/hono.js"
+			}
+		},
 		"./package.json": "./package.json"
 	},
 	"files": [
@@ -33,6 +39,14 @@
 		"test:integrated": "nix-build ./test/integrated/prometheus-scrape.nix"
 	},
 	"packageManager": "pnpm@12.10.1",
+	"peerDependencies": {
+		"hono": "^4.13.13"
+	},
+	"peerDependenciesMeta": {
+		"hono": {
+			"optional": true
+		}
+	},
 	"devDependencies": {
 		"@biomejs/biome": "2.4.15",
 		"@hono/node-server": "^2.1.3",

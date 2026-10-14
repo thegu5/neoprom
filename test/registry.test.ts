@@ -1,3 +1,8 @@
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
+import { Histogram } from "../src/metrics/histogram.ts";
+import { Registry } from "../src/registry.ts";
+
 // import { beforeEach, describe, it } from "node:test";
 // import { Counter, Histogram, globalRegistry } from "../src/index.ts";
 
@@ -31,3 +36,32 @@
 // 		console.log(await globalRegistry.getMetrics());
 // 	});
 // });
+
+describe("Registry histogram serialization", () => {
+	for (const contentType of ["Prometheus", "OpenMetricsV1"] as const) {
+		it(`serializes numeric bucket boundaries in ${contentType}`, async () => {
+			const registry = new Registry({ contentType });
+			const histogram = new Histogram({
+				name: "request_duration_seconds",
+				help: "Request duration",
+				buckets: [0.1, 1],
+				labelNames: ["route"],
+				registries: [registry],
+			});
+			histogram.observe({ route: "/users/:id" }, 0.05);
+			const metrics = await registry.getMetrics();
+			for (const boundary of ["0.1", "1", "+Inf"]) {
+				assert.ok(
+					metrics.includes(
+						`request_duration_seconds_bucket{le="${boundary}",route="/users/:id"} 1\n`,
+					),
+				);
+			}
+			assert.ok(
+				metrics.includes(
+					'request_duration_seconds_count{route="/users/:id"} 1\n',
+				),
+			);
+		});
+	}
+});
