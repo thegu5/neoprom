@@ -4,12 +4,13 @@ import type { Histogram } from "./metrics/histogram.ts";
 import type { Info } from "./metrics/info.ts";
 import type { Metric } from "./metrics/metric.ts";
 import type { StateSet } from "./metrics/stateSet.ts";
+import type { Summary } from "./metrics/summary.ts";
 import { getSymbol } from "./symbols.ts";
 import type { LabelObject } from "./utils.ts";
 
 export const RegistryContentType = {
 	Prometheus: "text/plain; version=0.0.4; charset=utf-8",
-	OpenMetrics: "application/openmetrics-text; version=1.0.0; charset=utf-8",
+	OpenMetricsV1: "application/openmetrics-text; version=1.0.0; charset=utf-8",
 } as const;
 
 interface RegistryOptions {
@@ -40,6 +41,12 @@ export class Registry {
 	 */
 	register(...metrics: Metric[]) {
 		for (const metric of metrics) {
+			if (
+				metric.type === getSymbol("Summary") &&
+				Object.hasOwn(this.#defaultLabels, "quantile")
+			) {
+				throw new Error('"quantile" is a reserved label keyword');
+			}
 			if (this.#metrics.has(metric.name)) {
 				throw new Error("metric with same name already exists");
 			}
@@ -73,9 +80,9 @@ export class Registry {
 	}
 
 	/**
-	 * Collect the registered metrics and format as a string
+	 * Collect the registered metrics and format as a string.
 	 */
-	async getMetrics() {
+	async getMetrics(contentType = this.contentType) {
 		await Promise.all(
 			Array.from(this.#metrics.values(), (metric) => metric.collect()),
 		);
@@ -89,7 +96,7 @@ export class Registry {
 
 			// TODO: how are metric names in comments escaped?
 			result += `# HELP ${escapeIfRequired(metric.name)} ${metric.help.replaceAll("\\", "\\\\").replaceAll("\n", "\\n")}\n`;
-			if (this.contentType === RegistryContentType.OpenMetrics && metric.unit) {
+			if (contentType === RegistryContentType.OpenMetricsV1 && metric.unit) {
 				result += `# UNIT ${escapeIfRequired(metric.name)} ${metric.unit}\n`;
 			}
 			result += `# TYPE ${escapeIfRequired(metric.name)} ${metric.constructor.name.toLowerCase()}\n`;
@@ -118,7 +125,7 @@ export class Registry {
 						result += getMetricLine(
 							`${metric.name}_bucket`,
 							agg,
-							Object.assign({ le: bucket }, labels),
+							Object.assign({ le: bucket.toString() }, labels),
 						);
 					}
 
@@ -132,7 +139,7 @@ export class Registry {
 					result += getMetricLine(`${metric.name}_count`, val.count, labels);
 				}
 			} else if (metric.type === getSymbol("Info")) {
-				if (this.contentType !== RegistryContentType.OpenMetrics) {
+				if (contentType !== RegistryContentType.OpenMetricsV1) {
 					// todo: decide whether to 'convert' to gauge in the prometheus text format
 					throw new Error(
 						"Info metric is only supported for the OpenMetrics output format",
@@ -143,7 +150,7 @@ export class Registry {
 					result += getMetricLine(metric.name, 1, labels);
 				}
 			} else if (metric.type === getSymbol("StateSet")) {
-				if (this.contentType !== RegistryContentType.OpenMetrics) {
+				if (contentType !== RegistryContentType.OpenMetricsV1) {
 					// todo: decide whether to 'convert' to gauge in the prometheus text format
 					throw new Error(
 						"StateSet metric is only supported for the OpenMetrics output format",
@@ -159,13 +166,43 @@ export class Registry {
 						);
 					}
 				}
+			} else if (metric.type === getSymbol("Summary")) {
+				const summary = metric as Summary;
+				const isOpenMetrics = contentType === RegistryContentType.OpenMetricsV1;
+				for (const val of summary.getValues()) {
+					const labels = Object.assign({}, this.#defaultLabels, val.labels);
+					if (Object.hasOwn(labels, "quantile")) {
+						throw new Error('"quantile" is a reserved label keyword');
+					}
+
+					for (const [quantile, value] of summary.getQuantiles(val)) {
+						if (isOpenMetrics && value < 0) {
+							throw new Error(
+								`Summary "${metric.name}" has a negative value (${value}) for quantile ${quantile}; OpenMetrics does not allow negative Summary quantile values`,
+							);
+						}
+						result += getMetricLine(
+							metric.name,
+							value,
+							Object.assign({ quantile: quantile.toString() }, labels),
+						);
+					}
+
+					if (isOpenMetrics && val.sum < 0) {
+						throw new Error(
+							`Summary "${metric.name}" has a negative sum (${val.sum}); OpenMetrics does not allow negative Summary sums`,
+						);
+					}
+					result += getMetricLine(`${metric.name}_sum`, val.sum, labels);
+					result += getMetricLine(`${metric.name}_count`, val.count, labels);
+				}
 			} else {
 				throw new Error(
 					`${metric.constructor.name} metric type not fully implemented`,
 				);
 			}
 		}
-		if (this.contentType === RegistryContentType.OpenMetrics) {
+		if (contentType === RegistryContentType.OpenMetricsV1) {
 			result += "# EOF\n";
 		}
 		return result;
