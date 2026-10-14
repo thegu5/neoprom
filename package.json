@@ -38,6 +38,9 @@
 		"test": "node --test **/*.test.ts",
 		"test:integrated": "nix-build ./test/integrated/prometheus-scrape.nix"
 	},
+	"engines": {
+		"node": ">=22.0.0"
+	},
 	"devEngines": {
 		"packageManager": {
 			"name": "pnpm",
