@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
+import { Gauge } from "../src/metrics/gauge.ts";
 import { Histogram } from "../src/metrics/histogram.ts";
 import { Registry } from "../src/registry.ts";
 
@@ -36,6 +37,30 @@ import { Registry } from "../src/registry.ts";
 // 		console.log(await globalRegistry.getMetrics());
 // 	});
 // });
+
+describe("Registry special numeric values", () => {
+	for (const contentType of ["Prometheus", "OpenMetricsV1"] as const) {
+		it(`serializes infinities and NaN in ${contentType}`, async () => {
+			const registry = new Registry({ contentType });
+			const gauge = new Gauge({
+				name: "special_value",
+				help: "Special numeric values",
+				labelNames: ["kind"],
+				registries: [registry],
+			});
+			gauge.set({ kind: "positive" }, Infinity);
+			gauge.set({ kind: "negative" }, -Infinity);
+			gauge.set({ kind: "nan" }, NaN);
+			gauge.set({ kind: "finite" }, 1.5);
+
+			const output = await registry.getMetrics();
+			assert.ok(output.includes('special_value{kind="positive"} +Inf\n'));
+			assert.ok(output.includes('special_value{kind="negative"} -Inf\n'));
+			assert.ok(output.includes('special_value{kind="nan"} NaN\n'));
+			assert.ok(output.includes('special_value{kind="finite"} 1.5\n'));
+		});
+	}
+});
 
 describe("Registry histogram serialization", () => {
 	for (const contentType of ["Prometheus", "OpenMetricsV1"] as const) {

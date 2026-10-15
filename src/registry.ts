@@ -222,8 +222,13 @@ function getMetricLine(
 	if (bracketEntries.length) {
 		result += `{${bracketEntries.join(",")}}`;
 	}
-	// normalize infinity - both should parse correctly, but all other libraries do this
-	result += ` ${value.toString().replace("Infinity", "Inf")}\n`;
+	const formattedValue =
+		value === Infinity
+			? "+Inf"
+			: value === -Infinity
+				? "-Inf"
+				: value.toString();
+	result += ` ${formattedValue}\n`;
 	return result;
 }
 
