@@ -3,6 +3,10 @@ import { Counter } from "./metrics/counter.ts";
 import { Gauge } from "./metrics/gauge.ts";
 import type { Metric } from "./metrics/metric.ts";
 
+// TODO: runtime-specific data? should work across nodejs/bun/workerd
+
+const processStartTime = Date.now() / 1000 - process.uptime();
+
 /**
  * Client-agnostic metrics covering details about the current process
  */
@@ -44,8 +48,48 @@ export const defaultMetrics: Metric[] = [
 				},
 			})
 		: null,
-	null, // TODO: process_virtual_memory_bytes
-	null, // TODO: process_virtual_memory_max_bytes
+	process.platform === "linux"
+		? new Gauge({
+				name: "process_virtual_memory_bytes",
+				help: "Virtual memory size in bytes.",
+				registries: [],
+				async collect() {
+					const status = await readFile("/proc/self/status", "utf-8");
+					const label = "VmSize:";
+					const line = status
+						.split("\n")
+						.find((line) => line.startsWith(label));
+					if (line !== undefined) {
+						const kibibytes = Number.parseInt(
+							line.slice(label.length).trim(),
+							10,
+						);
+						if (!Number.isNaN(kibibytes)) this.set(kibibytes * 1024);
+					}
+				},
+			})
+		: null,
+	process.platform === "linux"
+		? new Gauge({
+				name: "process_virtual_memory_max_bytes",
+				help: "Maximum amount of virtual memory available in bytes.",
+				registries: [],
+				async collect() {
+					const limits = await readFile("/proc/self/limits", "utf-8");
+					const label = "Max address space";
+					const line = limits
+						.split("\n")
+						.find((line) => line.startsWith(label));
+					if (line !== undefined) {
+						const value = line.slice(label.length).trim();
+						const bytes = value.startsWith("unlimited")
+							? Infinity
+							: Number.parseInt(value, 10);
+						if (!Number.isNaN(bytes)) this.set(bytes);
+					}
+				},
+			})
+		: null,
 	new Gauge({
 		name: "process_resident_memory_bytes",
 		help: "Resident memory size in bytes.",
@@ -54,16 +98,20 @@ export const defaultMetrics: Metric[] = [
 			this.set(process.memoryUsage.rss());
 		},
 	}),
-	null, // TODO: process_heap_bytes
-	new Counter({
+	new Gauge({
+		name: "process_heap_bytes",
+		help: "Total size of the JavaScript heap in bytes.",
+		registries: [],
+		collect() {
+			this.set(process.memoryUsage().heapTotal);
+		},
+	}),
+	new Gauge({
 		name: "process_start_time_seconds",
 		help: "Start time of the process since unix epoch in seconds.",
 		registries: [],
 		collect() {
-			this.reset();
-			this.inc(process.uptime());
+			this.set(processStartTime);
 		},
 	}),
 ].filter((m) => m !== null);
-
-// TODO: runtime-specific data? should work across nodejs/bun/deno/workerd
