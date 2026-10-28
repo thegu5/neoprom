@@ -5,13 +5,18 @@ import {
 	parseMetricParams,
 	startTimer,
 } from "../utils.ts";
-import { Metric } from "./metric.ts";
+import { Metric, type MetricConfiguration } from "./metric.ts";
 
 export class Gauge<L extends string = string> extends Metric<
 	Gauge<L>,
 	L,
 	{ value: number; labels: LabelObject<L> }
 > {
+	constructor(options: MetricConfiguration<Gauge<L>, L>) {
+		super(options);
+		this.reset();
+	}
+
 	/**
 	 * Increment gauge for given labels
 	 * @param labels Object with label keys and their values

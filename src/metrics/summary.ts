@@ -93,7 +93,6 @@ export class Summary<L extends string = string> extends Metric<
 		this.#ageBuckets = ageBuckets;
 		this.#pruneAgedBuckets = options.pruneAgedBuckets ?? false;
 
-		// needs to be done here instead of Metric's constructor since the config isn't set up yet
 		this.reset();
 	}
 
@@ -209,13 +208,6 @@ export class Summary<L extends string = string> extends Metric<
 	}
 
 	reset() {
-		// skip when called from `Metric`'s constructor
-		try {
-			this.#quantiles;
-		} catch (_) {
-			return;
-		}
-
 		this.valueMap.clear();
 		if (!this.labelNames.length) {
 			this.valueMap.set(hashLabels({}), this.#createValueEntry());

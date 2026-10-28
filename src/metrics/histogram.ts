@@ -40,7 +40,6 @@ export class Histogram<
 			config.buckets ??
 			([0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10] as B[]);
 
-		// needs to be done here instead of Metric's constructor since buckets aren't set up yet
 		this.reset();
 	}
 
@@ -127,13 +126,6 @@ export class Histogram<
 	}
 
 	reset() {
-		// skip when called from `Metric`'s constructor
-		try {
-			this.#buckets;
-		} catch (_) {
-			return;
-		}
-
 		this.valueMap.clear();
 		if (!this.labelNames.length) {
 			this.valueMap.set(hashLabels({}), this.#createValueEntry());

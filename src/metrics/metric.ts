@@ -39,6 +39,9 @@ export interface MetricConfiguration<T extends Metric<T, L>, L extends string> {
 	registries?: Registry[];
 }
 
+/**
+ * Subclasses are responsible for initializing their values once their own fields are ready.
+ */
 export abstract class Metric<
 	// biome-ignore lint/suspicious/noExplicitAny: TODO: figure out a better way to deal with weird self-referential types
 	T extends Metric<T, L, V> = any,
@@ -77,9 +80,6 @@ export abstract class Metric<
 		for (const registry of registries) {
 			registry.register(this);
 		}
-
-		// initialize value(s) with 0 if necessary
-		this.reset();
 	}
 
 	/**

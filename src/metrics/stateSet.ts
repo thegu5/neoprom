@@ -27,7 +27,6 @@ export class StateSet<
 		super(options);
 		this.#states = options.states;
 
-		// needs to be done here instead of Metric's constructor since states aren't set up yet
 		this.reset();
 	}
 	/**
@@ -77,13 +76,6 @@ export class StateSet<
 	}
 
 	reset() {
-		// skip when called from `Metric`'s constructor
-		try {
-			this.#states;
-		} catch (_) {
-			return;
-		}
-
 		this.valueMap.clear();
 		if (!this.labelNames.length) {
 			this.valueMap.set(hashLabels({}), this.#createValueEntry());

@@ -12,6 +12,7 @@ export class Counter<L extends string = string> extends Metric<
 			options.name += "_total";
 		}
 		super(options);
+		this.reset();
 	}
 	/**
 	 * Increment counter for labels
