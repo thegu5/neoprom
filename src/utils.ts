@@ -30,22 +30,18 @@ export function startTimer<L extends string>(
 	};
 }
 
-// horror.
-// TODO: can the typing here be cleaned up...?
 export function createHook<L extends string>(
 	startHook: (labels: LabelObject<L>) => () => void,
 	options?: { includeExceptions?: boolean },
 ) {
-	function wrapper<
-		F extends (this: T, ...args: R) => unknown,
-		R extends unknown[],
-		T,
-	>(fn: F): F;
-	function wrapper<
-		F extends (this: T, ...args: R) => unknown,
-		R extends unknown[],
-		T,
-	>(labels: LabelObject<L>, fn: F): F;
+  // Used for wrapping a function
+  function wrapper<F extends (...args: never[]) => unknown>(fn: F): F;
+  // Used for wrapping a function, with extra labels to set
+	function wrapper<F extends (...args: never[]) => unknown>(
+		labels: LabelObject<L>,
+		fn: F,
+  ): F;
+	// Used for decorating class methods
 	function wrapper(
 		labels?: LabelObject<L>,
 	): <T, R extends unknown[], V>(
