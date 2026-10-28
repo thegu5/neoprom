@@ -78,11 +78,12 @@ export function createHook<L extends string>(
 
 		return <T, R extends unknown[], V>(
 			target: (this: T, ...args: R) => V,
-			context: ClassMethodDecoratorContext<T, (this: T, ...args: R) => V>,
+			_context: ClassMethodDecoratorContext<T, (this: T, ...args: R) => V>,
 		) =>
 			function (this: T, ...args: R): V {
-				const endHook = startHook({
-					method: String(context.name), // TODO: is this a good idea?
+        const endHook = startHook({
+          // This seems like a nice feature, but other client libraries don't do it
+					// method: String(context.name),
 					...labels,
 				} as LabelObject<L>);
 				try {
