@@ -28,7 +28,8 @@ export class Counter<L extends string = string> extends Metric<
 	inc(param1?: LabelObject<L> | number, param2?: number) {
 		const [value, labels] = parseMetricParams(param1, param2, 1);
 
-		if (value < 0) {
+		// This syntax catches NaN along with negative numbers
+		if (!(value >= 0)) {
 			throw new Error("counter cannot decrease");
 		}
 
