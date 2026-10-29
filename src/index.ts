@@ -10,3 +10,4 @@ export * from "./metrics/summary.ts";
 
 export * from "./pushgateway.ts";
 export * from "./registry.ts";
+export type { LabelObject } from "./utils.ts";
