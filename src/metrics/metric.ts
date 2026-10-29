@@ -119,6 +119,17 @@ export abstract class Metric<
 	}
 
 	/**
+	 * Remove the value for the given labels, so it is no longer exported.
+	 * For metrics without labels, the value is reset to its default instead.
+	 */
+	remove(labels: LabelObject<L> = {}) {
+		this.valueMap.delete(hashLabels(labels));
+		if (!this.labelNames.length) {
+			this.reset();
+		}
+	}
+
+	/**
 	 * Reset the metric's values
 	 */
 	abstract reset(): void;
