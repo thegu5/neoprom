@@ -57,16 +57,16 @@ export class Histogram<
 	observe(param1: LabelObject<L> | number, param2?: number) {
 		const [value, labels] = parseMetricParams(param1, param2, 0);
 
+		if (!Number.isFinite(value)) {
+			throw new TypeError(`Value is not a valid number: ${value}`);
+		}
+
 		const hashed = hashLabels(labels);
 
 		let entry = this.valueMap.get(hashed);
 		if (!entry) {
 			entry = this.#createValueEntry(labels);
 			this.valueMap.set(hashed, entry);
-		}
-
-		if (!Number.isFinite(value)) {
-			throw new TypeError(`Value is not a valid number: ${value}`);
 		}
 
 		entry.sum += value;
