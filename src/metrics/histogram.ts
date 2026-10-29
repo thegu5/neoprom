@@ -28,18 +28,24 @@ export class Histogram<
 	readonly #buckets: readonly B[];
 
 	constructor(config: HistogramConfiguration<L, B>) {
-		super(config);
-
-		for (const label of this.labelNames) {
+		for (const label of config.labelNames ?? []) {
 			if (label === "le") {
 				throw new Error("le is a reserved label keyword");
 			}
 		}
 
-		this.#buckets =
+		const buckets =
 			config.buckets ??
 			([0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10] as B[]);
+		for (const bucket of buckets) {
+			if (!Number.isFinite(bucket)) {
+				throw new TypeError(`Bucket is not a valid number: ${bucket}`);
+			}
+		}
 
+		super(config);
+
+		this.#buckets = [...new Set(buckets)].sort((a, b) => a - b);
 		this.reset();
 	}
 
