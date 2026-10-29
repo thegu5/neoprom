@@ -1,9 +1,13 @@
 export function hashLabels(labels: Record<string, string | undefined>) {
-	return Object.entries(labels)
-		.filter(([_name, value]) => value)
-		.sort(([nameA], [nameB]) => (nameA < nameB ? -1 : nameA > nameB ? 1 : 0))
-		.map(([name, value]) => `${name}:${value}`)
-		.join(",");
+	const entries = Object.entries(labels)
+		.filter((entry): entry is [string, string] => entry[1] !== undefined)
+		.sort(([nameA], [nameB]) => (nameA < nameB ? -1 : nameA > nameB ? 1 : 0));
+
+	let hash = "";
+	for (const [name, value] of entries) {
+		hash += `${name.length}:${name}${value.length}:${value}`;
+	}
+	return hash;
 }
 
 export type LabelObject<L extends string = string> = Partial<Record<L, string>>;

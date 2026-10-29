@@ -70,8 +70,16 @@ describe("hashLabels", () => {
 		);
 	});
 
-	it("should filter out undefined and empty values", () => {
-		assert.equal(hashLabels({ a: undefined, b: "", c: "x" }), "c:x");
+	it("should filter out undefined values but keep empty strings", () => {
+		assert.notEqual(
+			hashLabels({ a: undefined, b: "", c: "x" }),
+			hashLabels({ c: "x" }),
+		);
+		assert.equal(hashLabels({ a: undefined }), "");
+	});
+
+	it("should not collide when label values contain separators", () => {
+		assert.notEqual(hashLabels({ a: "b,c:d" }), hashLabels({ a: "b", c: "d" }));
 	});
 
 	it("should return an empty string for no labels", () => {
