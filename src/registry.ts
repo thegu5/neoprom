@@ -6,7 +6,7 @@ import type { Metric } from "./metrics/metric.ts";
 import type { StateSet } from "./metrics/stateSet.ts";
 import type { Summary } from "./metrics/summary.ts";
 import { getSymbol } from "./symbols.ts";
-import type { LabelObject } from "./utils.ts";
+import { type LabelObject, validateLabelName } from "./utils.ts";
 
 export const RegistryContentType = {
 	Prometheus: "text/plain; version=0.0.4; charset=utf-8",
@@ -34,6 +34,12 @@ export class Registry {
 		this.contentType =
 			RegistryContentType[options?.contentType ?? "Prometheus"];
 		this.#defaultLabels = options?.defaultLabels ?? {};
+		for (const name of Object.keys(this.#defaultLabels)) {
+			validateLabelName(name);
+			if (name === "le" || name === "quantile") {
+				throw new Error(`"${name}" is a reserved label keyword`);
+			}
+		}
 	}
 
 	/**
@@ -41,12 +47,6 @@ export class Registry {
 	 */
 	register(...metrics: Metric[]) {
 		for (const metric of metrics) {
-			if (
-				metric.type === getSymbol("Summary") &&
-				Object.hasOwn(this.#defaultLabels, "quantile")
-			) {
-				throw new Error('"quantile" is a reserved label keyword');
-			}
 			if (this.#metrics.has(metric.name)) {
 				throw new Error("metric with same name already exists");
 			}
