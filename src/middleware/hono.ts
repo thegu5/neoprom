@@ -33,7 +33,6 @@ export function prometheus(options: PrometheusOptions = {}): MiddlewareHandler {
 				c.req.header("Accept"),
 				registry.contentType,
 			);
-			console.log(`negotiated content type ${contentType}`);
 			const header =
 				contentType === RegistryContentType.OpenMetricsV1
 					? `${contentType}; escaping=allow-utf-8`
