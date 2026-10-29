@@ -57,10 +57,10 @@
 		}
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.4.15",
+		"@biomejs/biome": "^2.6.4",
 		"@hono/node-server": "^2.1.5",
-		"@types/node": "^26.6.5",
-		"hono": "^4.13.13",
+		"@types/node": "^26.6.6",
+		"hono": "^4.13.14",
 		"typescript": "^7.0.2"
 	}
 }
