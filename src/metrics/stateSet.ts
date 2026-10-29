@@ -1,5 +1,5 @@
 import { hashLabels, isIn, type LabelObject } from "../utils.ts";
-import { Metric, type MetricConfiguration } from "./metric.ts";
+import { buildMetricName, Metric, type MetricConfiguration } from "./metric.ts";
 
 export interface StateSetConfiguration<L extends string, S extends string>
 	extends MetricConfiguration<StateSet<L, S>, L> {
@@ -16,9 +16,10 @@ export class StateSet<
 > {
 	readonly #states: readonly S[];
 	constructor(options: StateSetConfiguration<L, S>) {
-		if (isIn(options.labelNames ?? [], options.name)) {
+		const name = buildMetricName(options);
+		if (isIn(options.labelNames ?? [], name)) {
 			throw new Error(
-				`Label name ${options.name} cannot be the same as the metric name`,
+				`Label name ${name} cannot be the same as the metric name`,
 			);
 		}
 		if (!options.states?.length) {

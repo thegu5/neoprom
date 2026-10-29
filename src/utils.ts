@@ -1,3 +1,26 @@
+const metricNameRegex = /^[a-zA-Z_:][a-zA-Z0-9_:]*$/;
+const labelNameRegex = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
+
+/**
+ * Validate a metric name against the Prometheus data model.
+ * @see https://prometheus.io/docs/concepts/data_model/#metric-names-and-labels
+ */
+export function validateMetricName(name: string) {
+	if (!metricNameRegex.test(name)) {
+		throw new Error(`Invalid metric name: "${name}"`);
+	}
+}
+
+/**
+ * Validate a label name against the Prometheus data model.
+ * @see https://prometheus.io/docs/concepts/data_model/#metric-names-and-labels
+ */
+export function validateLabelName(name: string) {
+	if (!labelNameRegex.test(name)) {
+		throw new Error(`Invalid label name: "${name}"`);
+	}
+}
+
 export function hashLabels(labels: Record<string, string | undefined>) {
 	const entries = Object.entries(labels)
 		.filter((entry): entry is [string, string] => entry[1] !== undefined)
@@ -38,13 +61,13 @@ export function createHook<L extends string>(
 	startHook: (labels: LabelObject<L>) => () => void,
 	options?: { includeExceptions?: boolean },
 ) {
-  // Used for wrapping a function
-  function wrapper<F extends (...args: never[]) => unknown>(fn: F): F;
-  // Used for wrapping a function, with extra labels to set
+	// Used for wrapping a function
+	function wrapper<F extends (...args: never[]) => unknown>(fn: F): F;
+	// Used for wrapping a function, with extra labels to set
 	function wrapper<F extends (...args: never[]) => unknown>(
 		labels: LabelObject<L>,
 		fn: F,
-  ): F;
+	): F;
 	// Used for decorating class methods
 	function wrapper(
 		labels?: LabelObject<L>,
@@ -81,8 +104,8 @@ export function createHook<L extends string>(
 			_context: ClassMethodDecoratorContext<T, (this: T, ...args: R) => V>,
 		) =>
 			function (this: T, ...args: R): V {
-        const endHook = startHook({
-          // This seems like a nice feature, but other client libraries don't do it
+				const endHook = startHook({
+					// This seems like a nice feature, but other client libraries don't do it
 					// method: String(context.name),
 					...labels,
 				} as LabelObject<L>);

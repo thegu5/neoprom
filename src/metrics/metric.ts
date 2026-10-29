@@ -1,5 +1,11 @@
 import { globalRegistry, type Registry } from "../registry.ts";
 import { getSymbol } from "../symbols.ts";
+import {
+	hashLabels,
+	type LabelObject,
+	validateLabelName,
+	validateMetricName,
+} from "../utils.ts";
 
 export interface MetricConfiguration<T extends Metric<T, L>, L extends string> {
 	/**
@@ -40,6 +46,25 @@ export interface MetricConfiguration<T extends Metric<T, L>, L extends string> {
 }
 
 /**
+ * Build a metric name from its namespace, subsystem, name and unit parts.
+ */
+export function buildMetricName(config: {
+	name: string;
+	namespace?: string;
+	subsystem?: string;
+	unit?: string;
+}) {
+	let name = "";
+	if (config.namespace) name += `${config.namespace}_`;
+	if (config.subsystem) name += `${config.subsystem}_`;
+	name += config.name;
+	if (config.unit && !name.endsWith(`_${config.unit}`)) {
+		name += `_${config.unit}`;
+	}
+	return name;
+}
+
+/**
  * Subclasses are responsible for initializing their values once their own fields are ready.
  */
 export abstract class Metric<
@@ -59,19 +84,16 @@ export abstract class Metric<
 	protected valueMap = new Map<string, V>();
 
 	constructor(config: MetricConfiguration<T, L>) {
-		let name = "";
-		if (config.subsystem) name += `${config.subsystem}_`;
-		if (config.namespace) name += `${config.namespace}_`;
-		name += config.name;
+		const name = buildMetricName(config);
+		validateMetricName(name);
 
 		this.unit = config.unit;
-		if (config.unit && !name.endsWith(`_${config.unit}`)) {
-			name += `_${config.unit}`;
-		}
-
 		this.name = name;
 		this.help = config.help;
 		this.labelNames = config.labelNames ?? [];
+		for (const labelName of this.labelNames) {
+			validateLabelName(labelName);
+		}
 		this.#collect = config.collect;
 
 		this.type = getSymbol(this.constructor.name);
