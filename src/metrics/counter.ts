@@ -44,6 +44,14 @@ export class Counter<L extends string = string> extends Metric<
 	}
 
 	/**
+	 * Initialize the counter for the given labels to 0
+	 * @param labels Labels to initialize
+	 */
+	zero(labels: LabelObject<L> = {}) {
+		this.valueMap.set(hashLabels(labels), { labels, value: 0 });
+	}
+
+	/**
 	 * Get sub-counter for a given set of labels
 	 * @param labels Labels to affect when used
 	 */
@@ -51,6 +59,9 @@ export class Counter<L extends string = string> extends Metric<
 		return {
 			inc: (value?: number) => {
 				this.inc(labels, value);
+			},
+			zero: () => {
+				this.zero(labels);
 			},
 			reset: () => {
 				this.valueMap.delete(hashLabels(labels));

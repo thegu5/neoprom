@@ -135,6 +135,14 @@ export class Gauge<L extends string = string> extends Metric<
 	);
 
 	/**
+	 * Initialize the gauge for the given labels to 0
+	 * @param labels Labels to initialize
+	 */
+	zero(labels: LabelObject<L> = {}) {
+		this.valueMap.set(hashLabels(labels), { labels, value: 0 });
+	}
+
+	/**
 	 * Get sub-gauge for a given set of labels
 	 * @param labels Labels to affect when used
 	 */
@@ -148,6 +156,9 @@ export class Gauge<L extends string = string> extends Metric<
 			},
 			set: (value?: number) => {
 				this.set(labels, value);
+			},
+			zero: () => {
+				this.zero(labels);
 			},
 			startTimer: () => {
 				return this.startTimer(labels);

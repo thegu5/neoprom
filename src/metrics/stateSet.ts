@@ -66,6 +66,7 @@ export class StateSet<
 			set: (states: Partial<Record<S, boolean>>) => {
 				this.set(labels, states);
 			},
+			zero: () => this.zero(labels),
 			reset: () => {
 				this.valueMap.delete(hashLabels(labels));
 			},
