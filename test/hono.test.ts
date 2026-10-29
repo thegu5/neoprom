@@ -96,7 +96,6 @@ describe("Hono middleware", () => {
 		await app.request("/missing-one");
 		await app.request("/missing-two");
 		const { body } = await scrape(app);
-		console.log(body);
 		assert.ok(
 			body.includes(
 				'http_requests_total{method="GET",route="/failure",status="503",ok="false"} 1\n',
