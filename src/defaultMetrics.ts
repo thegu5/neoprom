@@ -4,6 +4,7 @@ import { Gauge } from "./metrics/gauge.ts";
 import type { Metric } from "./metrics/metric.ts";
 
 // TODO: runtime-specific data? should work across nodejs/bun/workerd
+// TODO: double check accuracy of some of these metrics - e.g. cpuUsage + workers, process.memoryUsage()
 
 const processStartTime = Date.now() / 1000 - process.uptime();
 
@@ -100,7 +101,7 @@ export const defaultMetrics: Metric[] = [
 	}),
 	new Gauge({
 		name: "process_heap_bytes",
-		help: "Total size of the JavaScript heap in bytes.",
+		help: "Process heap size in bytes.",
 		registries: [],
 		collect() {
 			this.set(process.memoryUsage().heapTotal);
@@ -114,4 +115,5 @@ export const defaultMetrics: Metric[] = [
 			this.set(processStartTime);
 		},
 	}),
+	// not implemented, because it doesn't make much sense (?): process_threads
 ].filter((m) => m !== null);
