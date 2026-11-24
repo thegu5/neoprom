@@ -1,18 +1,13 @@
 import * as assert from "node:assert/strict";
-import { beforeEach, describe, it } from "node:test";
+import { describe, it } from "node:test";
 import {
 	Counter,
 	Gauge,
-	globalRegistry,
 	Histogram,
 	Registry,
 } from "../src/index.ts";
 
 describe("metric names", () => {
-	beforeEach(() => {
-		globalRegistry.clear();
-	});
-
 	it("builds names as namespace_subsystem_name", () => {
 		const counter = new Counter({
 			name: "requests",
@@ -45,10 +40,6 @@ describe("metric names", () => {
 });
 
 describe("labeled metric helpers", () => {
-	beforeEach(() => {
-		globalRegistry.clear();
-	});
-
 	it("removes a single child", () => {
 		const counter = new Counter({
 			name: "counter_remove",
@@ -109,10 +100,6 @@ describe("labeled metric helpers", () => {
 });
 
 describe("counter validation", () => {
-	beforeEach(() => {
-		globalRegistry.clear();
-	});
-
 	it("rejects NaN increments", () => {
 		const counter = new Counter({ name: "counter_nan", help: "test" });
 
@@ -121,10 +108,6 @@ describe("counter validation", () => {
 });
 
 describe("histogram buckets", () => {
-	beforeEach(() => {
-		globalRegistry.clear();
-	});
-
 	it("sorts and deduplicates buckets", () => {
 		const histogram = new Histogram({
 			name: "histogram_buckets",

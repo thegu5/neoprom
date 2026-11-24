@@ -46,8 +46,8 @@ describe("Registry special numeric values", () => {
 				name: "special_value",
 				help: "Special numeric values",
 				labelNames: ["kind"],
-				registries: [registry],
-			});
+      });
+      registry.register(gauge);
 			gauge.set({ kind: "positive" }, Infinity);
 			gauge.set({ kind: "negative" }, -Infinity);
 			gauge.set({ kind: "nan" }, NaN);
@@ -71,8 +71,8 @@ describe("Registry histogram serialization", () => {
 				help: "Request duration",
 				buckets: [0.1, 1],
 				labelNames: ["route"],
-				registries: [registry],
-			});
+      });
+      registry.register(histogram);
 			histogram.observe({ route: "/users/:id" }, 0.05);
 			const metrics = await registry.getMetrics();
 			for (const boundary of ["0.1", "1", "+Inf"]) {

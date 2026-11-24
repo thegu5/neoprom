@@ -1,12 +1,11 @@
 import * as assert from "node:assert/strict";
 import { beforeEach, describe, it } from "node:test";
-import { globalRegistry, Histogram } from "../src/index.ts";
+import { Histogram } from "../src/index.ts";
 
 let instance: Histogram;
 
 describe("histogram", () => {
 	beforeEach(() => {
-		globalRegistry.clear();
 		instance = new Histogram({ name: "histogram_test", help: "test" });
 	});
 

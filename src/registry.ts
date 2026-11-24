@@ -1,11 +1,10 @@
-import type { Counter } from "./metrics/counter.ts";
-import type { Gauge } from "./metrics/gauge.ts";
-import type { Histogram } from "./metrics/histogram.ts";
-import type { Info } from "./metrics/info.ts";
+import { Counter } from "./metrics/counter.ts";
+import { Gauge } from "./metrics/gauge.ts";
+import { Histogram } from "./metrics/histogram.ts";
+import { Info } from "./metrics/info.ts";
 import type { Metric } from "./metrics/metric.ts";
-import type { StateSet } from "./metrics/stateSet.ts";
-import type { Summary } from "./metrics/summary.ts";
-import { getSymbol } from "./symbols.ts";
+import { StateSet } from "./metrics/stateSet.ts";
+import { Summary } from "./metrics/summary.ts";
 import { type LabelObject, validateLabelName } from "./utils.ts";
 
 export const RegistryContentType = {
@@ -101,20 +100,20 @@ export class Registry {
 			}
 			result += `# TYPE ${escapeIfRequired(metric.name)} ${metric.constructor.name.toLowerCase()}\n`;
 
-			if (metric.type === getSymbol("Counter")) {
-				for (const val of (metric as Counter).getValues()) {
+			if (metric instanceof Counter) {
+				for (const val of metric.getValues()) {
 					const labels = Object.assign({}, this.#defaultLabels, val.labels);
 
 					result += getMetricLine(metric.name, val.value, labels);
 				}
-			} else if (metric.type === getSymbol("Gauge")) {
-				for (const val of (metric as Gauge).getValues()) {
+			} else if (metric instanceof Gauge) {
+				for (const val of metric.getValues()) {
 					const labels = Object.assign({}, this.#defaultLabels, val.labels);
 
 					result += getMetricLine(metric.name, val.value, labels);
 				}
-			} else if (metric.type === getSymbol("Histogram")) {
-				for (const val of (metric as Histogram).getValues()) {
+			} else if (metric instanceof Histogram) {
+				for (const val of metric.getValues()) {
 					const labels = Object.assign({}, this.#defaultLabels, val.labels);
 
 					let agg = 0;
@@ -138,25 +137,25 @@ export class Registry {
 					result += getMetricLine(`${metric.name}_sum`, val.sum, labels);
 					result += getMetricLine(`${metric.name}_count`, val.count, labels);
 				}
-			} else if (metric.type === getSymbol("Info")) {
+			} else if (metric instanceof Info) {
 				if (contentType !== RegistryContentType.OpenMetricsV1) {
 					// todo: decide whether to 'convert' to gauge in the prometheus text format
 					throw new Error(
 						"Info metric is only supported for the OpenMetrics output format",
 					);
 				}
-				for (const val of (metric as Info).getValues()) {
+				for (const val of metric.getValues()) {
 					const labels = Object.assign({}, this.#defaultLabels, val.labels);
 					result += getMetricLine(metric.name, 1, labels);
 				}
-			} else if (metric.type === getSymbol("StateSet")) {
+			} else if (metric instanceof StateSet) {
 				if (contentType !== RegistryContentType.OpenMetricsV1) {
 					// todo: decide whether to 'convert' to gauge in the prometheus text format
 					throw new Error(
 						"StateSet metric is only supported for the OpenMetrics output format",
 					);
 				}
-				for (const val of (metric as StateSet).getValues()) {
+				for (const val of metric.getValues()) {
 					const labels = Object.assign({}, this.#defaultLabels, val.labels);
 					for (const [stateName, stateValue] of Object.entries(val.states)) {
 						result += getMetricLine(
@@ -166,16 +165,15 @@ export class Registry {
 						);
 					}
 				}
-			} else if (metric.type === getSymbol("Summary")) {
-				const summary = metric as Summary;
+			} else if (metric instanceof Summary) {
 				const isOpenMetrics = contentType === RegistryContentType.OpenMetricsV1;
-				for (const val of summary.getValues()) {
+				for (const val of metric.getValues()) {
 					const labels = Object.assign({}, this.#defaultLabels, val.labels);
 					if (Object.hasOwn(labels, "quantile")) {
 						throw new Error('"quantile" is a reserved label keyword');
 					}
 
-					for (const [quantile, value] of summary.getQuantiles(val)) {
+					for (const [quantile, value] of metric.getQuantiles(val)) {
 						if (isOpenMetrics && value < 0) {
 							throw new Error(
 								`Summary "${metric.name}" has a negative value (${value}) for quantile ${quantile}; OpenMetrics does not allow negative Summary quantile values`,

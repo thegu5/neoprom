@@ -1,12 +1,11 @@
 import * as assert from "node:assert/strict";
 import { beforeEach, describe, it } from "node:test";
-import { globalRegistry, Info } from "../src/index.ts";
+import { Info } from "../src/index.ts";
 
 let instance: Info;
 
 describe("info", () => {
 	beforeEach(() => {
-		globalRegistry.clear();
 		instance = new Info({ name: "build", help: "test" });
 	});
 

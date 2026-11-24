@@ -1,6 +1,6 @@
 import * as assert from "node:assert/strict";
 import { afterEach, beforeEach, describe, it, mock } from "node:test";
-import { globalRegistry, Registry, Summary } from "../src/index.ts";
+import { Registry, Summary } from "../src/index.ts";
 import { TDigest } from "../src/quantiles/tdigest.ts";
 import { TimeWindowQuantiles } from "../src/quantiles/timeWindowQuantiles.ts";
 
@@ -15,7 +15,6 @@ const getEntries = (summary: Summary) =>
 
 describe("summary", () => {
 	beforeEach(() => {
-		globalRegistry.clear();
 		instance = new Summary({ name: "summary_test", help: "test" });
 	});
 
@@ -424,8 +423,8 @@ describe("summary", () => {
 				name: "request_duration_seconds",
 				help: "test",
 				percentiles: [],
-				registries: [registry],
 			});
+			registry.register(summary);
 			summary.observe(1);
 			summary.observe(2);
 
@@ -447,8 +446,8 @@ describe("summary", () => {
 				name: "request_duration_seconds",
 				help: "test",
 				percentiles: [0.99, 0.5],
-				registries: [registry],
 			});
+			registry.register(summary);
 			summary.observe(1);
 			summary.observe(2);
 			summary.observe(3);
@@ -474,8 +473,8 @@ describe("summary", () => {
 				help: "test",
 				labelNames: ["method"],
 				percentiles: [0.5],
-				registries: [registry],
 			});
+			registry.register(summary);
 			summary.observe({ method: "GET" }, 1);
 			summary.observe({ method: "POST" }, 5);
 
@@ -497,12 +496,13 @@ describe("summary", () => {
 
 		it("should expose NaN quantiles when the window is empty", async () => {
 			const registry = new Registry();
-			new Summary({
-				name: "request_duration_seconds",
-				help: "test",
-				percentiles: [0.5],
-				registries: [registry],
-			});
+			registry.register(
+				new Summary({
+					name: "request_duration_seconds",
+					help: "test",
+					percentiles: [0.5],
+				}),
+			);
 
 			assert.equal(
 				await registry.getMetrics(),
@@ -527,8 +527,8 @@ describe("summary", () => {
 				maxAgeSeconds: 100,
 				ageBuckets: 4,
 				pruneAgedBuckets: true,
-				registries: [registry],
 			});
+      registry.register(summary);
 			summary.observe(1);
 
 			// the whole window has aged out
@@ -543,8 +543,8 @@ describe("summary", () => {
 				unit: "seconds",
 				help: "test",
 				percentiles: [0.5],
-				registries: [registry],
-			});
+      });
+      registry.register(summary);
 			summary.observe(2);
 
 			assert.equal(

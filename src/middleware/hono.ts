@@ -18,14 +18,13 @@ export function prometheus(options: PrometheusOptions = {}): MiddlewareHandler {
 		help: "Duration of HTTP requests in seconds",
 		unit: "seconds",
 		labelNames,
-		registries: [registry],
 	});
 	const requestsTotal = new Counter({
 		name: "http_requests_total",
 		help: "Total number of HTTP requests",
 		labelNames,
-		registries: [registry],
-	});
+  });
+  registry.register(requestDuration, requestsTotal);
 
 	return async (c, next) => {
 		if (c.req.method === "GET" && c.req.path === "/metrics") {

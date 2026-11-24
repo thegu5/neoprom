@@ -1,12 +1,11 @@
 import * as assert from "node:assert/strict";
 import { beforeEach, describe, it } from "node:test";
-import { globalRegistry, StateSet } from "../src/index.ts";
+import { StateSet } from "../src/index.ts";
 
 let instance: StateSet;
 
 describe("stateSet", () => {
 	beforeEach(() => {
-		globalRegistry.clear();
 		instance = new StateSet({
 			name: "service_state",
 			help: "test",

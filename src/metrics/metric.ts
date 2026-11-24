@@ -1,5 +1,3 @@
-import { globalRegistry, type Registry } from "../registry.ts";
-import { getSymbol } from "../symbols.ts";
 import {
 	hashLabels,
 	type LabelObject,
@@ -39,10 +37,6 @@ export interface MetricConfiguration<T extends Metric<T, L>, L extends string> {
 	 * @param this The current metric
 	 */
 	collect?: (this: T) => void | Promise<void>;
-	/**
-	 * An array of registries to register the metric to. Defaults to the global registry
-	 */
-	registries?: Registry[];
 }
 
 /**
@@ -79,7 +73,6 @@ export abstract class Metric<
 
 	readonly labelNames: readonly string[];
 	readonly #collect: MetricConfiguration<T, L>["collect"];
-	readonly type: symbol;
 
 	protected valueMap = new Map<string, V>();
 
@@ -95,13 +88,6 @@ export abstract class Metric<
 			validateLabelName(labelName);
 		}
 		this.#collect = config.collect;
-
-		this.type = getSymbol(this.constructor.name);
-
-		const registries = config.registries ?? [globalRegistry];
-		for (const registry of registries) {
-			registry.register(this);
-		}
 	}
 
 	/**

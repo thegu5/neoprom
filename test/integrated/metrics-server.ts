@@ -2,15 +2,19 @@ import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { Gauge, globalRegistry, Histogram } from "../../src/index.ts";
 
-new Gauge({
-	name: "collectors_ready",
-	help: "Number of active collectors",
-}).inc();
+const gauge = new Gauge({
+  name: "collectors_ready",
+  help: "Number of active collectors",
+});
+gauge.inc();
 
 const hist = new Histogram({
 	name: "bweh_hist",
 	help: ".",
 });
+
+globalRegistry.register(gauge, hist);
+
 hist.observe(-1);
 hist.observe(0);
 hist.observe(0.5);

@@ -72,11 +72,11 @@ describe("Hono middleware", () => {
 		const counter = new Counter({
 			name: "custom",
 			help: "Custom metric",
-			registries: [registry],
 			collect() {
 				this.inc();
 			},
-		});
+    });
+    registry.register(counter);
 		const app = createApp(registry);
 		assert.ok((await scrape(app)).body.includes("custom_total 1\n"));
 		assert.equal(counter.getValues().next().value?.value, 1);
@@ -170,8 +170,8 @@ describe("Hono middleware", () => {
 		const info = new Info({
 			name: "build",
 			help: "Build information",
-			registries: [registry],
-		});
+    });
+    registry.register(info);
 		info.set({ version: "1" });
 		const app = createApp(registry);
 		const { body } = await scrape(

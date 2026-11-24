@@ -4,7 +4,7 @@ import { syncBuiltinESMExports } from "node:module";
 import { afterEach, describe, it, mock } from "node:test";
 import { defaultMetrics } from "../src/defaultMetrics.ts";
 import { Gauge } from "../src/metrics/gauge.ts";
-import { globalRegistry, Registry } from "../src/registry.ts";
+import { Registry } from "../src/registry.ts";
 
 function getGauge(name: string) {
 	const metric = defaultMetrics.find((metric) => metric.name === name);
@@ -28,10 +28,6 @@ describe("default metrics", () => {
 		mock.restoreAll();
 		syncBuiltinESMExports();
 		for (const metric of defaultMetrics) metric.reset();
-	});
-
-	it("does not register metrics globally", async () => {
-		assert.equal(await globalRegistry.getMetrics(), "");
 	});
 
 	it("only includes proc-based metrics on Linux", () => {

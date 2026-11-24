@@ -15,7 +15,6 @@ export const defaultMetrics: Metric[] = [
 	new Counter({
 		name: "process_cpu_seconds_total",
 		help: "Total user and system CPU time spent in seconds.",
-		registries: [],
 		collect() {
 			this.reset();
 			const usage = process.cpuUsage(); // todo double check workers
@@ -26,7 +25,6 @@ export const defaultMetrics: Metric[] = [
 		? new Gauge({
 				name: "process_open_fds",
 				help: "Number of open file descriptors.",
-				registries: [],
 				async collect() {
 					this.set((await readdir("/proc/self/fd")).length - 1);
 				},
@@ -36,7 +34,6 @@ export const defaultMetrics: Metric[] = [
 		? new Gauge({
 				name: "process_max_fds",
 				help: "Maximum number of open file descriptors.",
-				registries: [],
 				async collect() {
 					const limits = await readFile("/proc/self/limits", "utf-8");
 					const val = Number(
@@ -53,7 +50,6 @@ export const defaultMetrics: Metric[] = [
 		? new Gauge({
 				name: "process_virtual_memory_bytes",
 				help: "Virtual memory size in bytes.",
-				registries: [],
 				async collect() {
 					const status = await readFile("/proc/self/status", "utf-8");
 					const label = "VmSize:";
@@ -74,7 +70,6 @@ export const defaultMetrics: Metric[] = [
 		? new Gauge({
 				name: "process_virtual_memory_max_bytes",
 				help: "Maximum amount of virtual memory available in bytes.",
-				registries: [],
 				async collect() {
 					const limits = await readFile("/proc/self/limits", "utf-8");
 					const label = "Max address space";
@@ -94,7 +89,6 @@ export const defaultMetrics: Metric[] = [
 	new Gauge({
 		name: "process_resident_memory_bytes",
 		help: "Resident memory size in bytes.",
-		registries: [],
 		collect() {
 			this.set(process.memoryUsage.rss());
 		},
@@ -102,7 +96,6 @@ export const defaultMetrics: Metric[] = [
 	new Gauge({
 		name: "process_heap_bytes",
 		help: "Process heap size in bytes.",
-		registries: [],
 		collect() {
 			this.set(process.memoryUsage().heapTotal);
 		},
@@ -110,7 +103,6 @@ export const defaultMetrics: Metric[] = [
 	new Gauge({
 		name: "process_start_time_seconds",
 		help: "Start time of the process since unix epoch in seconds.",
-		registries: [],
 		collect() {
 			this.set(processStartTime);
 		},
