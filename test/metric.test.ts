@@ -1,11 +1,6 @@
 import * as assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import {
-	Counter,
-	Gauge,
-	Histogram,
-	Registry,
-} from "../src/index.ts";
+import { Counter, Gauge, Histogram, Registry } from "../src/index.ts";
 
 describe("metric names", () => {
 	it("builds names as namespace_subsystem_name", () => {

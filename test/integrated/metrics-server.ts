@@ -3,8 +3,8 @@ import { Hono } from "hono";
 import { Gauge, globalRegistry, Histogram } from "../../src/index.ts";
 
 const gauge = new Gauge({
-  name: "collectors_ready",
-  help: "Number of active collectors",
+	name: "collectors_ready",
+	help: "Number of active collectors",
 });
 gauge.inc();
 

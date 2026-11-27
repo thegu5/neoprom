@@ -528,7 +528,7 @@ describe("summary", () => {
 				ageBuckets: 4,
 				pruneAgedBuckets: true,
 			});
-      registry.register(summary);
+			registry.register(summary);
 			summary.observe(1);
 
 			// the whole window has aged out
@@ -543,8 +543,8 @@ describe("summary", () => {
 				unit: "seconds",
 				help: "test",
 				percentiles: [0.5],
-      });
-      registry.register(summary);
+			});
+			registry.register(summary);
 			summary.observe(2);
 
 			assert.equal(
