@@ -35,7 +35,7 @@
 	"scripts": {
 		"build": "tsc -p tsconfig.build.json",
 		"prepack": "pnpm build",
-		"test": "node --test **/*.test.ts",
+		"test": "node --test \"**/*.test.ts\"",
 		"test:integrated": "nix-build ./test/integrated/prometheus-scrape.nix"
 	},
 	"engines": {

@@ -1,97 +1,35 @@
-import type { MiddlewareHandler } from "hono";
+import { createMiddleware } from "hono/factory";
 import { routePath } from "hono/route";
-import { Counter } from "../metrics/counter.ts";
-import { Histogram } from "../metrics/histogram.ts";
-import { Registry, RegistryContentType } from "../registry.ts";
+import {
+	createMiddlewareHelper,
+	type PrometheusOptions,
+	UNMATCHED_ROUTE,
+} from "./utils.ts";
 
-export interface PrometheusOptions {
-	/** Registry for HTTP and custom metrics. Defaults to a new, isolated registry. */
-	registry?: Registry;
-}
+export type { PrometheusOptions };
 
-/** Collect HTTP metrics and serve /metrics. Register before application routes. */
-export function prometheus(options: PrometheusOptions = {}): MiddlewareHandler {
-	const registry = options.registry ?? new Registry();
-	const labelNames = ["method", "route", "status", "ok"] as const;
-	const requestDuration = new Histogram({
-		name: "http_request_duration_seconds",
-		help: "Duration of HTTP requests in seconds",
-		unit: "seconds",
-		labelNames,
-	});
-	const requestsTotal = new Counter({
-		name: "http_requests_total",
-		help: "Total number of HTTP requests",
-		labelNames,
-  });
-  registry.register(requestDuration, requestsTotal);
-
-	return async (c, next) => {
-		if (c.req.method === "GET" && c.req.path === "/metrics") {
-			const contentType = negotiateContentType(
+export function prometheus(options: PrometheusOptions = {}) {
+	const metrics = createMiddlewareHelper(options);
+	return createMiddleware(async (c, next) => {
+		if (metrics.isMetricsRequest(c.req.method, c.req.path)) {
+			const { body, contentType } = await metrics.renderMetrics(
 				c.req.header("Accept"),
-				registry.contentType,
 			);
-			const header =
-				contentType === RegistryContentType.OpenMetricsV1
-					? `${contentType}; escaping=allow-utf-8`
-					: contentType;
-			return c.body(await registry.getMetrics(contentType), 200, {
-				"Content-Type": header,
-			});
+			return c.body(body, 200, { "Content-Type": contentType });
 		}
 
-		const start = performance.now();
+		const end = metrics.startRequest();
+		let status = 500; // if next() throws, the server will respond with a 500
 		try {
 			await next();
+			status = c.res.status;
 		} finally {
-			const labels = {
+			end({
 				method: c.req.method,
-				route: routePath(c) || "*",
-				status: String(c.res.status),
-				ok: String(c.res.ok),
-			};
-			requestDuration.observe(labels, (performance.now() - start) / 1000);
-			requestsTotal.inc(labels);
+				route: routePath(c) || UNMATCHED_ROUTE,
+				status,
+				ok: String(status >= 200 && status < 300),
+			});
 		}
-	};
-}
-
-function negotiateContentType(
-	accept: string | undefined,
-	fallback: Registry["contentType"],
-): Registry["contentType"] {
-	let selected = fallback;
-	let highestQuality = 0;
-	for (const range of accept?.split(",") ?? []) {
-		const [mime, ...parameters] = range.trim().toLowerCase().split(";");
-		const params = new Map(
-			parameters.map((parameter) => {
-				const [key, value = ""] = parameter.trim().split("=");
-				return [key, value.replace(/^"(.*)"$/, "$1")];
-			}),
-		);
-		const qualityText = params.get("q") ?? "1";
-		if (!/^(?:0(?:\.\d{0,3})?|1(?:\.0{0,3})?)$/.test(qualityText)) continue;
-		const quality = Number(qualityText);
-		if (quality <= highestQuality) continue;
-		// The registry implements UTF-8 names, not the other escaping schemes.
-		if (params.has("escaping") && params.get("escaping") !== "allow-utf-8") {
-			continue;
-		}
-		let contentType: Registry["contentType"];
-		if (mime === "text/plain" && params.get("version") === "0.0.4") {
-			contentType = RegistryContentType.Prometheus;
-		} else if (
-			mime === "application/openmetrics-text" &&
-			params.get("version") === "1.0.0"
-		) {
-			contentType = RegistryContentType.OpenMetricsV1;
-		} else {
-			continue;
-		}
-		selected = contentType;
-		highestQuality = quality;
-	}
-	return selected;
+	});
 }
